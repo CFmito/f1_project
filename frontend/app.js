@@ -166,19 +166,22 @@ function initRandomizer() {
     });
 }
 
-// 6. Игра: Тест Реакции с сохранением результатов (ИСПРАВЛЕНО)
+// 6. Игра: Тест Реакции с поддержкой Пробела и Клика
 function initReactionGame() {
     const startBtn = document.getElementById('start-reaction-btn');
     const statusText = document.getElementById('reaction-status');
     const lights = document.querySelectorAll('.light-circle');
     let startTime, timerId, intervalId;
-    let gameState = 'idle';
+    let gameState = 'idle'; // 'idle', 'waiting', 'ready'
 
     function resetLights() {
         lights.forEach(l => l.className = 'w-8 h-8 rounded-full bg-slate-800 light-circle');
     }
 
-    startBtn.addEventListener('click', () => {
+    startBtn.addEventListener('click', (e) => {
+        // Убираем фокус с кнопки "Старт", чтобы нажатие Пробела не кликало на нее повторно
+        startBtn.blur();
+
         clearTimeout(timerId);
         clearInterval(intervalId);
 
@@ -206,6 +209,7 @@ function initReactionGame() {
         }, 800);
     });
 
+    // Функция обработки реакции (при клике или нажатии Пробела)
     async function handleInteraction() {
         if (gameState === 'waiting') {
             clearTimeout(timerId);
@@ -230,7 +234,19 @@ function initReactionGame() {
         }
     }
 
+    // Реакция по клику на область светофоров
     document.getElementById('lights-container').addEventListener('click', handleInteraction);
+
+    // Реакция по нажатию на клавишу ПРОБЕЛ
+    document.addEventListener('keydown', (e) => {
+        if (e.code === 'Space') {
+            // Предотвращаем стандартную прокрутку страницы от пробела
+            e.preventDefault(); 
+            if (gameState === 'waiting' || gameState === 'ready') {
+                handleInteraction();
+            }
+        }
+    });
 }
 
 // 7. Мини-гонка на Canvas
