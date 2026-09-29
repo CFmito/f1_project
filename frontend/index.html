@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ru" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>F1 Interactive Blog | Deep Blue Edition</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            navyBg: '#0a0f1d',
+            navyCard: '#111827',
+            navyBorder: '#1e293b',
+            cyanAccent: '#00d2ff',
+            blueHighlight: '#2563eb'
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-navyBg text-slate-100 font-sans min-h-screen flex flex-col justify-between">
+
+  <!-- Header -->
+  <header class="border-b border-navyBorder bg-navyBg/80 backdrop-blur sticky top-0 z-50">
+    <div class="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
+      <div class="flex items-center gap-3">
+        <span class="bg-cyanAccent text-black text-xs font-black italic px-2 py-1 rounded shadow-lg shadow-cyanAccent/20">F1</span>
+        <h1 class="text-xl font-bold tracking-wider uppercase text-white">Mercedes & F1 Hub</h1>
+      </div>
+      <nav class="flex gap-6 text-sm font-medium text-slate-300">
+        <a href="#drivers" class="hover:text-cyanAccent transition">Пилоты</a>
+        <a href="#configurator" class="hover:text-cyanAccent transition">Рандомайзер</a>
+        <a href="#game" class="hover:text-cyanAccent transition">Мини-Игра</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="max-w-6xl mx-auto px-4 py-12 text-center">
+    <h2 class="text-4xl md:text-6xl font-extrabold tracking-tight mb-4">
+      Скорость. Инженерия. <span class="text-cyanAccent">Python API.</span>
+    </h2>
+    <p class="text-slate-400 max-w-2xl mx-auto text-lg">
+      Интерактивный блог о Формуле-1 на базе Python FastAPI. Изучите статистику Хэмилтона, Антонелли и Рассела, соберите болид и проверьте скорость реакции!
+    </p>
+  </section>
+
+  <!-- 1. Drivers Section -->
+  <section id="drivers" class="max-w-6xl mx-auto px-4 py-10">
+    <h3 class="text-2xl font-bold mb-6 flex items-center gap-2">
+      <span class="w-2 h-6 bg-cyanAccent inline-block rounded"></span> Любимые Пилоты
+    </h3>
+    <div id="drivers-container" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div class="text-slate-400">Загрузка пилотов из Python API...</div>
+    </div>
+  </section>
+
+  <!-- 2. Randomizer Section -->
+  <section id="configurator" class="max-w-6xl mx-auto px-4 py-10">
+    <div class="bg-navyCard border border-navyBorder rounded-2xl p-6 md:p-8 shadow-xl">
+      <div class="max-w-2xl">
+        <h3 class="text-2xl font-bold mb-2 flex items-center gap-2">
+          <span class="w-2 h-6 bg-cyanAccent inline-block rounded"></span> Рандомайзер Сборки Болида
+        </h3>
+        <p class="text-slate-400 text-sm mb-6">
+          Сгенерируйте случайную конфигурацию болида, мотора и стратегии через Python (FastAPI) Бэкенд.
+        </p>
+        <button id="randomize-btn" class="bg-cyanAccent hover:bg-cyan-400 text-black font-bold py-3 px-6 rounded-lg transition flex items-center gap-2 shadow-lg shadow-cyanAccent/20">
+          🏎️ Собрать болид
+        </button>
+      </div>
+
+      <div id="car-result" class="mt-8 hidden grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4 pt-6 border-t border-navyBorder">
+        <div class="bg-navyBg p-4 rounded-lg border border-navyBorder">
+          <span class="text-xs text-slate-400 uppercase font-semibold">Шасси</span>
+          <p id="res-chassis" class="font-bold text-white mt-1">-</p>
+        </div>
+        <div class="bg-navyBg p-4 rounded-lg border border-navyBorder">
+          <span class="text-xs text-slate-400 uppercase font-semibold">Двигатель</span>
+          <p id="res-engine" class="font-bold text-white mt-1">-</p>
+        </div>
+        <div class="bg-navyBg p-4 rounded-lg border border-navyBorder">
+          <span class="text-xs text-slate-400 uppercase font-semibold">Шины</span>
+          <p id="res-tyres" class="font-bold text-white mt-1">-</p>
+        </div>
+        <div class="bg-navyBg p-4 rounded-lg border border-navyBorder">
+          <span class="text-xs text-slate-400 uppercase font-semibold">Стратегия</span>
+          <p id="res-strategy" class="font-bold text-white mt-1">-</p>
+        </div>
+        <div class="bg-navyBg p-4 rounded-lg border border-cyanAccent/50">
+          <span class="text-xs text-cyanAccent uppercase font-semibold">Индекс Скорости</span>
+          <p id="res-score" class="font-black text-2xl text-cyanAccent mt-1">-</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. Mini Games Section -->
+  <section id="game" class="max-w-6xl mx-auto px-4 py-10 mb-12">
+    <h3 class="text-2xl font-bold mb-6 flex items-center gap-2">
+      <span class="w-2 h-6 bg-cyanAccent inline-block rounded"></span> Интерактивный Блок
+    </h3>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <!-- Тест Реакции -->
+      <div class="bg-navyCard border border-navyBorder rounded-2xl p-6 flex flex-col justify-between shadow-xl">
+        <div>
+          <h4 class="text-xl font-bold mb-2">🚥 Тест Реакции: Lights Out!</h4>
+          <p class="text-slate-400 text-sm mb-4">Дождитесь гашения 5 огней и кликните мышкой или нажмите <b>ПРОБЕЛ</b>!</p>
+          
+          <div class="bg-navyBg p-4 rounded-xl flex justify-center gap-3 mb-6 border border-navyBorder" id="lights-container">
+            <div class="w-8 h-8 rounded-full bg-slate-800 light-circle"></div>
+            <div class="w-8 h-8 rounded-full bg-slate-800 light-circle"></div>
+            <div class="w-8 h-8 rounded-full bg-slate-800 light-circle"></div>
+            <div class="w-8 h-8 rounded-full bg-slate-800 light-circle"></div>
+            <div class="w-8 h-8 rounded-full bg-slate-800 light-circle"></div>
+          </div>
+        </div>
+
+        <div class="text-center">
+          <div id="reaction-status" class="text-lg font-bold mb-4 text-slate-300">Нажмите "Старт" для подготовки</div>
+          <button id="start-reaction-btn" class="w-full bg-blueHighlight hover:bg-blue-600 text-white font-bold py-3 rounded-lg transition shadow-lg shadow-blueHighlight/20">
+            Начать тест
+          </button>
+        </div>
+      </div>
+
+      <!-- Мини-гонка -->
+      <div class="bg-navyCard border border-navyBorder rounded-2xl p-6 flex flex-col items-center shadow-xl">
+        <div class="w-full text-left mb-4">
+          <h4 class="text-xl font-bold">🏎️ Мини-Гонка: Обгоны</h4>
+          <p class="text-slate-400 text-sm">Управляйте болидом стрелками <b>Влево / Вправо</b> или клавишами <b>A / D</b>!</p>
+        </div>
+
+        <canvas id="raceCanvas" width="280" height="320" class="bg-navyBg border border-navyBorder rounded-lg shadow-inner mb-4"></canvas>
+
+        <div class="w-full flex justify-between items-center">
+          <span id="race-score" class="font-bold text-lg text-cyanAccent">Счет: 0</span>
+          <button id="start-race-btn" class="bg-cyanAccent hover:bg-cyan-400 text-black font-bold px-6 py-2 rounded-lg transition">
+            Старт гонки
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="border-t border-navyBorder py-6 text-center text-slate-500 text-sm">
+    <p>© 2026 F1 Interactive Blog. Powered by Python (FastAPI) & Tailwind CSS.</p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

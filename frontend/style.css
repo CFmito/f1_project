@@ -1,0 +1,19 @@
+/* Плавный скролл */
+html {
+    scroll-behavior: smooth;
+  }
+  
+  /* Кастомный скроллбар в тёмно-синих тонах */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #0a0f1d;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #1e293b;
+    border-radius: 4px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #00d2ff;
+  }
