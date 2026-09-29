@@ -1,11 +1,11 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
+from fastapi.staticfiles import StaticFiles
 import random
 
 app = FastAPI(title="F1 Interactive Blog API")
 
-# Настройка CORS для взаимодействия с фронтендом
+# Настройка CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -14,7 +14,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Данные о ваших любимых пилотах
+# Подключение папки static для отдачи изображений
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
+# Список пилотов
 DRIVERS = [
     {
         "id": "1",
@@ -24,7 +27,7 @@ DRIVERS = [
         "bio": "Семикратный чемпион мира, рекордсмен по количеству побед и поулов в истории Формулы-1. Легенда автоспорта.",
         "podiums": 197,
         "world_titles": 7,
-        "image_url": "https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?w=500&auto=format&fit=crop&q=60"
+        "image_url": "http://localhost:8080/static/lh44.jpg"
     },
     {
         "id": "2",
@@ -34,7 +37,7 @@ DRIVERS = [
         "bio": "Молодой восходящий феномен итальянского автоспорта, прошедший стремительный путь через юниорские серии прямо в состав Mercedes.",
         "podiums": 0,
         "world_titles": 0,
-        "image_url": "https://images.unsplash.com/photo-1541348263662-e082662d82da?w=500&auto=format&fit=crop&q=60"
+        "image_url": "http://localhost:8080/static/ka12.jpg"
     },
     {
         "id": "3",
@@ -44,18 +47,16 @@ DRIVERS = [
         "bio": "Победитель Гран-при, известнейший своим аналитическим подходом к гонкам, выдержкой и высокой скоростью в квалификациях.",
         "podiums": 14,
         "world_titles": 0,
-        "image_url": "https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=500&auto=format&fit=crop&q=60"
+        "image_url": "http://localhost:8080/static/gr63.jpg"
     }
 ]
 
 @app.get("/api/drivers")
 def get_drivers():
-    """Возвращает список любимых пилотов"""
     return DRIVERS
 
 @app.get("/api/random-car")
 def get_random_car():
-    """Рандомайзер сборки болида F1"""
     chassis_list = ["Mercedes W16", "Ferrari SF-25", "McLaren MCL39", "Red Bull RB21"]
     engine_list = ["Mercedes-AMG V6", "Ferrari V6 Turbo", "Honda RBPT", "Renault E-Tech"]
     tyres_list = ["Soft (C5 - Красные)", "Medium (C3 - Жёлтые)", "Hard (C1 - Белые)", "Intermediate (Зелёные)"]
@@ -68,5 +69,3 @@ def get_random_car():
         "strategy": random.choice(strategy_list),
         "score": random.randint(75, 99)
     }
-
-# Запуск сервера: uvicorn main:app --reload --port 8080
