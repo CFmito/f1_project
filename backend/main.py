@@ -1,11 +1,11 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+from pydantic import BaseModel
 import random
 
 app = FastAPI(title="F1 Interactive Blog API")
 
-# Настройка CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -14,10 +14,19 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Подключение папки static для отдачи изображений
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
-# Список пилотов
+# Временное хранилище рекордов (Leaderboard)
+LEADERBOARD = [
+    {"player": "Max_V", "time_ms": 195},
+    {"player": "Charles_16", "time_ms": 210},
+    {"player": "Speedy", "time_ms": 235}
+]
+
+class ScoreRequest(BaseModel):
+    player: str
+    time_ms: int
+
 DRIVERS = [
     {
         "id": "1",
@@ -69,3 +78,26 @@ def get_random_car():
         "strategy": random.choice(strategy_list),
         "score": random.randint(75, 99)
     }
+
+# Новый эндпоинт: Информация о ближайшей гонке
+@app.get("/api/next-race")
+def get_next_race():
+    return {
+        "title": "Гран-при Монако",
+        "circuit": "Circuit de Monaco",
+        "location": "Монте-Карло, Монако",
+        # Установите дату следующей гонки в формате ISO (YYYY-MM-DDTHH:MM:SS)
+        "race_time": "2026-10-15T15:00:00"
+    }
+
+# Новый эндпоинт: Получить таблицу лидеров
+@app.get("/api/leaderboard")
+def get_leaderboard():
+    # Сортируем по возрастанию времени реакции (чем меньше ms, тем лучше)
+    return sorted(LEADERBOARD, key=lambda x: x["time_ms"])[:5]
+
+# Новый эндпоинт: Сохранить рекорд
+@app.post("/api/leaderboard")
+def save_score(score: ScoreRequest):
+    LEADERBOARD.append({"player": score.player, "time_ms": score.time_ms})
+    return {"status": "success"}

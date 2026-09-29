@@ -3,13 +3,47 @@ let driversData = [];
 
 document.addEventListener('DOMContentLoaded', () => {
     fetchDrivers();
+    fetchNextRace();
+    fetchLeaderboard();
     initRandomizer();
     initReactionGame();
     initMiniRaceGame();
     initModalEvents();
 });
 
-// 1. Загрузка и отображение карточек
+// 1. Таймер обратного отсчета Гран-при
+async function fetchNextRace() {
+    try {
+        const res = await fetch(`${API_URL}/next-race`);
+        const race = await res.json();
+
+        document.getElementById('race-title').innerText = `${race.title} (${race.circuit})`;
+        document.getElementById('race-location').innerText = `📍 ${race.location}`;
+
+        const raceDate = new Date(race.race_time).getTime();
+
+        setInterval(() => {
+            const now = new Date().getTime();
+            const diff = raceDate - now;
+
+            if (diff <= 0) return;
+
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+            document.getElementById('timer-days').innerText = String(days).padStart(2, '0');
+            document.getElementById('timer-hours').innerText = String(hours).padStart(2, '0');
+            document.getElementById('timer-minutes').innerText = String(minutes).padStart(2, '0');
+            document.getElementById('timer-seconds').innerText = String(seconds).padStart(2, '0');
+        }, 1000);
+    } catch (e) {
+        console.error('Ошибка загрузки гонки:', e);
+    }
+}
+
+// 2. Загрузка карточек пилотов
 async function fetchDrivers() {
     const container = document.getElementById('drivers-container');
     try {
@@ -17,11 +51,9 @@ async function fetchDrivers() {
         if (!response.ok) throw new Error('Ошибка сети');
         driversData = await response.json();
 
-        // Формируем увеличенные карточки с интерактивным кликом
         container.innerHTML = driversData.map(d => `
             <div onclick="openDriverModal('${d.id}')" class="bg-navyCard border border-navyBorder rounded-2xl overflow-hidden hover:border-cyanAccent hover:scale-[1.02] transition duration-300 shadow-xl cursor-pointer group flex flex-col justify-between">
                 <div>
-                    <!-- Увеличена высота изображения до h-64 -->
                     <div class="overflow-hidden h-64">
                         <img src="${d.image_url}" alt="${d.name}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
                     </div>
@@ -48,11 +80,42 @@ async function fetchDrivers() {
         `).join('');
     } catch (err) {
         console.error(err);
-        container.innerHTML = `<div class="text-red-400">Не удалось загрузить данные с Python-сервера. Проверьте запуск на :8080.</div>`;
+        container.innerHTML = `<div class="text-red-400">Не удалось загрузить данные с Python-сервера.</div>`;
     }
 }
 
-// 2. Логика модального окна
+// 3. Таблица лидеров (Leaderboard)
+async function fetchLeaderboard() {
+    const listEl = document.getElementById('leaderboard-list');
+    try {
+        const res = await fetch(`${API_URL}/leaderboard`);
+        const leaderboard = await res.json();
+
+        listEl.innerHTML = leaderboard.map((item, idx) => `
+            <li class="flex justify-between items-center bg-navyBg/60 px-3 py-1.5 rounded-lg border border-navyBorder">
+                <span><b>${idx + 1}.</b> ${item.player}</span>
+                <span class="font-mono text-cyanAccent font-bold">${item.time_ms} ms</span>
+            </li>
+        `).join('');
+    } catch (e) {
+        console.error('Ошибка загрузки лидерборда', e);
+    }
+}
+
+async function saveScoreToApi(playerName, timeMs) {
+    try {
+        await fetch(`${API_URL}/leaderboard`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ player: playerName, time_ms: timeMs })
+        });
+        fetchLeaderboard();
+    } catch (e) {
+        console.error('Ошибка сохранения счета', e);
+    }
+}
+
+// 4. Модальное окно
 function openDriverModal(id) {
     const driver = driversData.find(d => d.id === id);
     if (!driver) return;
@@ -73,19 +136,11 @@ function initModalEvents() {
     const closeBtn = document.getElementById('close-modal-btn');
 
     closeBtn.addEventListener('click', () => modal.classList.add('hidden'));
-    
-    // Закрытие при клике на затенённый фон
-    modal.addEventListener('click', (e) => {
-        if (e.target === modal) modal.classList.add('hidden');
-    });
-
-    // Закрытие по клавише Esc
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') modal.classList.add('hidden');
-    });
+    modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.add('hidden'); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') modal.classList.add('hidden'); });
 }
 
-// 3. Рандомайзер болида
+// 5. Рандомайзер болида
 function initRandomizer() {
     const btn = document.getElementById('randomize-btn');
     const resultBox = document.getElementById('car-result');
@@ -111,32 +166,34 @@ function initRandomizer() {
     });
 }
 
-// 4. Игра: Тест Реакции
+// 6. Игра: Тест Реакции с сохранением результатов (ИСПРАВЛЕНО)
 function initReactionGame() {
     const startBtn = document.getElementById('start-reaction-btn');
     const statusText = document.getElementById('reaction-status');
     const lights = document.querySelectorAll('.light-circle');
-    let startTime, timerId, gameState = 'idle';
+    let startTime, timerId, intervalId;
+    let gameState = 'idle';
 
     function resetLights() {
         lights.forEach(l => l.className = 'w-8 h-8 rounded-full bg-slate-800 light-circle');
     }
 
     startBtn.addEventListener('click', () => {
-        if (gameState === 'waiting' || gameState === 'ready') return;
-        
+        clearTimeout(timerId);
+        clearInterval(intervalId);
+
         gameState = 'waiting';
         resetLights();
         statusText.innerText = 'Внимание... Приготовьтесь!';
         statusText.className = 'text-lg font-bold mb-4 text-amber-400';
 
         let currentLight = 0;
-        const interval = setInterval(() => {
+        intervalId = setInterval(() => {
             if (currentLight < 5) {
                 lights[currentLight].className = 'w-8 h-8 rounded-full bg-red-600 shadow-lg shadow-red-500 light-circle';
                 currentLight++;
             } else {
-                clearInterval(interval);
+                clearInterval(intervalId);
                 const delay = Math.random() * 2500 + 1000;
                 timerId = setTimeout(() => {
                     resetLights();
@@ -149,9 +206,10 @@ function initReactionGame() {
         }, 800);
     });
 
-    function handleInteraction() {
+    async function handleInteraction() {
         if (gameState === 'waiting') {
             clearTimeout(timerId);
+            clearInterval(intervalId);
             gameState = 'idle';
             statusText.innerText = '❌ Фальстарт! Попробуйте снова.';
             statusText.className = 'text-lg font-bold mb-4 text-red-400';
@@ -159,21 +217,23 @@ function initReactionGame() {
         } else if (gameState === 'ready') {
             const reactionTime = Date.now() - startTime;
             gameState = 'idle';
+
             statusText.innerText = `🏁 Ваша реакция: ${reactionTime} ms!`;
             statusText.className = 'text-xl font-extrabold mb-4 text-cyanAccent';
+
+            setTimeout(async () => {
+                const playerName = prompt(`Ваш результат: ${reactionTime} ms!\nВведите ваше имя для таблицы лидеров:`);
+                if (playerName && playerName.trim()) {
+                    await saveScoreToApi(playerName.trim(), reactionTime);
+                }
+            }, 100);
         }
     }
 
     document.getElementById('lights-container').addEventListener('click', handleInteraction);
-    document.addEventListener('keydown', (e) => {
-        if (e.code === 'Space' && (gameState === 'waiting' || gameState === 'ready')) {
-            e.preventDefault();
-            handleInteraction();
-        }
-    });
 }
 
-// 5. Мини-гонка на Canvas
+// 7. Мини-гонка на Canvas
 function initMiniRaceGame() {
     const canvas = document.getElementById('raceCanvas');
     const ctx = canvas.getContext('2d');
