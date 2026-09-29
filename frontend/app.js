@@ -1,34 +1,48 @@
 const API_URL = 'http://localhost:8080/api';
+let driversData = [];
 
 document.addEventListener('DOMContentLoaded', () => {
     fetchDrivers();
     initRandomizer();
     initReactionGame();
     initMiniRaceGame();
+    initModalEvents();
 });
 
-// 1. Загрузка пилотов с Python бэкенда
+// 1. Загрузка и отображение карточек
 async function fetchDrivers() {
     const container = document.getElementById('drivers-container');
     try {
         const response = await fetch(`${API_URL}/drivers`);
         if (!response.ok) throw new Error('Ошибка сети');
-        const drivers = await response.json();
+        driversData = await response.json();
 
-        container.innerHTML = drivers.map(d => `
-            <div class="bg-navyCard border border-navyBorder rounded-2xl overflow-hidden hover:border-cyanAccent transition duration-300 shadow-lg">
-                <img src="${d.image_url}" alt="${d.name}" class="w-full h-48 object-cover">
-                <div class="p-5">
-                    <div class="flex justify-between items-start mb-2">
-                        <h4 class="text-xl font-bold text-white">${d.name}</h4>
-                        <span class="text-2xl font-black text-cyanAccent italic">#${d.number}</span>
+        // Формируем увеличенные карточки с интерактивным кликом
+        container.innerHTML = driversData.map(d => `
+            <div onclick="openDriverModal('${d.id}')" class="bg-navyCard border border-navyBorder rounded-2xl overflow-hidden hover:border-cyanAccent hover:scale-[1.02] transition duration-300 shadow-xl cursor-pointer group flex flex-col justify-between">
+                <div>
+                    <!-- Увеличена высота изображения до h-64 -->
+                    <div class="overflow-hidden h-64">
+                        <img src="${d.image_url}" alt="${d.name}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
                     </div>
-                    <p class="text-xs text-blue-400 font-semibold mb-3 uppercase tracking-wider">${d.team}</p>
-                    <p class="text-slate-400 text-sm mb-4 line-clamp-3">${d.bio}</p>
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="text-2xl font-bold text-white group-hover:text-cyanAccent transition">${d.name}</h4>
+                            <span class="text-3xl font-black text-cyanAccent italic">#${d.number}</span>
+                        </div>
+                        <p class="text-xs text-blue-400 font-semibold mb-3 uppercase tracking-wider">${d.team}</p>
+                        <p class="text-slate-400 text-sm line-clamp-2 mb-4">${d.bio}</p>
+                    </div>
+                </div>
+                
+                <div class="px-6 pb-6 pt-2">
                     <div class="flex justify-between text-xs text-slate-300 pt-3 border-t border-navyBorder">
                         <span>🏆 Подиумы: <b>${d.podiums}</b></span>
                         <span>👑 Титулы: <b>${d.world_titles}</b></span>
                     </div>
+                    <span class="block text-center text-xs text-cyanAccent font-semibold mt-3 opacity-0 group-hover:opacity-100 transition">
+                        Нажмите, чтобы узнать больше →
+                    </span>
                 </div>
             </div>
         `).join('');
@@ -38,7 +52,40 @@ async function fetchDrivers() {
     }
 }
 
-// 2. Рандомайзер болида
+// 2. Логика модального окна
+function openDriverModal(id) {
+    const driver = driversData.find(d => d.id === id);
+    if (!driver) return;
+
+    document.getElementById('modal-img').src = driver.image_url;
+    document.getElementById('modal-name').innerText = driver.name;
+    document.getElementById('modal-number').innerText = `#${driver.number}`;
+    document.getElementById('modal-team').innerText = driver.team;
+    document.getElementById('modal-bio').innerText = driver.bio;
+    document.getElementById('modal-podiums').innerText = driver.podiums;
+    document.getElementById('modal-titles').innerText = driver.world_titles;
+
+    document.getElementById('driver-modal').classList.remove('hidden');
+}
+
+function initModalEvents() {
+    const modal = document.getElementById('driver-modal');
+    const closeBtn = document.getElementById('close-modal-btn');
+
+    closeBtn.addEventListener('click', () => modal.classList.add('hidden'));
+    
+    // Закрытие при клике на затенённый фон
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) modal.classList.add('hidden');
+    });
+
+    // Закрытие по клавише Esc
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') modal.classList.add('hidden');
+    });
+}
+
+// 3. Рандомайзер болида
 function initRandomizer() {
     const btn = document.getElementById('randomize-btn');
     const resultBox = document.getElementById('car-result');
@@ -64,7 +111,7 @@ function initRandomizer() {
     });
 }
 
-// 3. Игра: Тест Реакции
+// 4. Игра: Тест Реакции
 function initReactionGame() {
     const startBtn = document.getElementById('start-reaction-btn');
     const statusText = document.getElementById('reaction-status');
@@ -126,7 +173,7 @@ function initReactionGame() {
     });
 }
 
-// 4. Мини-гонка на Canvas
+// 5. Мини-гонка на Canvas
 function initMiniRaceGame() {
     const canvas = document.getElementById('raceCanvas');
     const ctx = canvas.getContext('2d');
@@ -140,7 +187,7 @@ function initMiniRaceGame() {
     let isRunning = false;
 
     function drawPlayer() {
-        ctx.fillStyle = '#00d2ff'; // Неоново-голубой болид
+        ctx.fillStyle = '#00d2ff';
         ctx.fillRect(player.x, player.y, player.width, player.height);
         ctx.fillStyle = '#000';
         ctx.fillRect(player.x - 4, player.y + 5, 5, 12);
