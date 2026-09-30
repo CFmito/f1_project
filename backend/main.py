@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 import random
+from datetime import datetime, timedelta
 
 app = FastAPI(title="F1 Interactive Blog API")
 
@@ -34,7 +35,7 @@ DRIVERS = [
         "number": 44,
         "team": "Scuderia Ferrari / Mercedes",
         "bio": "Семикратный чемпион мира, рекордсмен по количеству побед и поулов в истории Формулы-1. Легенда автоспорта.",
-        "podiums": 197,
+        "podiums": 207,
         "world_titles": 7,
         "image_url": "http://localhost:8080/static/lh44.jpg"
     },
@@ -44,7 +45,7 @@ DRIVERS = [
         "number": 12,
         "team": "Mercedes-AMG Petronas",
         "bio": "Молодой восходящий феномен итальянского автоспорта, прошедший стремительный путь через юниорские серии прямо в состав Mercedes.",
-        "podiums": 0,
+        "podiums": 15,
         "world_titles": 0,
         "image_url": "http://localhost:8080/static/ka12.jpg"
     },
@@ -54,7 +55,7 @@ DRIVERS = [
         "number": 63,
         "team": "Mercedes-AMG Petronas",
         "bio": "Победитель Гран-при, известнейший своим аналитическим подходом к гонкам, выдержкой и высокой скоростью в квалификациях.",
-        "podiums": 14,
+        "podiums": 31,
         "world_titles": 0,
         "image_url": "http://localhost:8080/static/gr63.jpg"
     }
@@ -79,15 +80,68 @@ def get_random_car():
         "score": random.randint(75, 99)
     }
 
-# Новый эндпоинт: Информация о ближайшей гонке
+# Календарь предстоящих Гран-при (в формате ISO с UTC временем Z)
+F1_SCHEDULE = [
+    {
+        "title": "Гран-при Сингапура",
+        "circuit": "Marina Bay Street Circuit",
+        "location": "Марина-Бэй, Сингапур",
+        "race_time": "2026-10-11T12:00:00Z"
+    },
+    {
+        "title": "Гран-при США",
+        "circuit": "Circuit of the Americas",
+        "location": "Остин, США",
+        "race_time": "2026-10-25T20:00:00Z"
+    },
+    {
+        "title": "Гран-при Мехико",
+        "circuit": "Autódromo Hermanos Rodríguez",
+        "location": "Мехико, Мексика",
+        "race_time": "2026-11-01T20:00:00Z"
+    },
+    {
+        "title": "Гран-при Сан-Паулу",
+        "circuit": "Autódromo José Carlos Pace",
+        "location": "Сан-Паулу, Бразилия",
+        "race_time": "2026-11-08T17:00:00Z"
+    },
+    {
+        "title": "Гран-при Лас-Вегаса",
+        "circuit": "Las Vegas Strip Circuit",
+        "location": "Лас-Вегас, США",
+        "race_time": "2026-11-22T04:00:00Z"
+    },
+    {
+        "title": "Гран-при Катара",
+        "circuit": "Lusail International Circuit",
+        "location": "Лусаил, Катар",
+        "race_time": "2026-11-29T16:00:00Z"
+    },
+    {
+        "title": "Гран-при Абу-Даби",
+        "circuit": "Yas Marina Circuit",
+        "location": "Абу-Даби, ОАЭ",
+        "race_time": "2026-12-06T13:00:00Z"
+    }
+]
+
 @app.get("/api/next-race")
 def get_next_race():
+    now = datetime.utcnow()
+    
+    # Ищем первую гонку из списка, дата которой еще не прошла
+    for race in F1_SCHEDULE:
+        race_dt = datetime.fromisoformat(race["race_time"].replace("Z", "+00:00")).replace(tzinfo=None)
+        if race_dt > now:
+            return race
+
+    # Если сезон закончился, возвращаем сообщение или последний этап
     return {
-        "title": "Гран-при Монако",
-        "circuit": "Circuit de Monaco",
-        "location": "Монте-Карло, Монако",
-        # Установите дату следующей гонки в формате ISO (YYYY-MM-DDTHH:MM:SS)
-        "race_time": "2026-10-15T15:00:00"
+        "title": "Сезон завершен",
+        "circuit": "Ожидаем новый календарь",
+        "location": "F1 2027",
+        "race_time": now.isoformat()
     }
 
 # Новый эндпоинт: Получить таблицу лидеров
