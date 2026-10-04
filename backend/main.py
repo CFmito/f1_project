@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 import random
-from datetime import datetime, timedelta
+from datetime import datetime
 
 app = FastAPI(title="F1 Interactive Blog API")
 
@@ -15,6 +15,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Раздача статических файлов (картинок)
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # Временное хранилище рекордов (Leaderboard)
@@ -37,7 +38,7 @@ DRIVERS = [
         "bio": "Семикратный чемпион мира, рекордсмен по количеству побед и поулов в истории Формулы-1. Легенда автоспорта.",
         "podiums": 207,
         "world_titles": 7,
-        "image_url": "http://localhost:8080/static/lh44.jpg"
+        "image_url": "/static/lh44.jpg"  # Используем относительный путь вместо жесткой привязки к порту
     },
     {
         "id": "2",
@@ -47,7 +48,7 @@ DRIVERS = [
         "bio": "Молодой восходящий феномен итальянского автоспорта, прошедший стремительный путь через юниорские серии прямо в состав Mercedes.",
         "podiums": 15,
         "world_titles": 0,
-        "image_url": "http://localhost:8080/static/ka12.jpg"
+        "image_url": "/static/ka12.jpg"
     },
     {
         "id": "3",
@@ -57,7 +58,7 @@ DRIVERS = [
         "bio": "Победитель Гран-при, известнейший своим аналитическим подходом к гонкам, выдержкой и высокой скоростью в квалификациях.",
         "podiums": 31,
         "world_titles": 0,
-        "image_url": "http://localhost:8080/static/gr63.jpg"
+        "image_url": "/static/gr63.jpg"
     }
 ]
 
@@ -130,13 +131,11 @@ F1_SCHEDULE = [
 def get_next_race():
     now = datetime.utcnow()
     
-    # Ищем первую гонку из списка, дата которой еще не прошла
     for race in F1_SCHEDULE:
         race_dt = datetime.fromisoformat(race["race_time"].replace("Z", "+00:00")).replace(tzinfo=None)
         if race_dt > now:
             return race
 
-    # Если сезон закончился, возвращаем сообщение или последний этап
     return {
         "title": "Сезон завершен",
         "circuit": "Ожидаем новый календарь",
@@ -144,14 +143,14 @@ def get_next_race():
         "race_time": now.isoformat()
     }
 
-# Новый эндпоинт: Получить таблицу лидеров
 @app.get("/api/leaderboard")
 def get_leaderboard():
-    # Сортируем по возрастанию времени реакции (чем меньше ms, тем лучше)
     return sorted(LEADERBOARD, key=lambda x: x["time_ms"])[:5]
 
-# Новый эндпоинт: Сохранить рекорд
 @app.post("/api/leaderboard")
 def save_score(score: ScoreRequest):
     LEADERBOARD.append({"player": score.player, "time_ms": score.time_ms})
     return {"status": "success"}
+
+# Раздача фронтенда из папки frontend
+app.mount("/", StaticFiles(directory="/frontend", html=True), name="frontend")
