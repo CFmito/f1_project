@@ -346,3 +346,28 @@ function initMiniRaceGame() {
         }
     });
 }
+
+async function loadTeamHistory() {
+    try {
+      const response = await fetch('/api/team-history');
+      const history = await response.json();
+      
+      const container = document.getElementById('history-timeline');
+      container.innerHTML = history.map(item => `
+        <div class="timeline-item">
+          <div class="timeline-year">${item.year}</div>
+          <div class="timeline-content">
+            <h3>${item.title}</h3>
+            <p>${item.description}</p>
+          </div>
+        </div>
+      `).join('');
+    } catch (error) {
+      console.error('Ошибка загрузки истории команды:', error);
+    }
+  }
+  
+  // Вызов функции при загрузке страницы
+  document.addEventListener('DOMContentLoaded', () => {
+    loadTeamHistory();
+  });
