@@ -1,10 +1,11 @@
-const API_URL = 'http://localhost:8080/api';
 let driversData = [];
 
+// Главная инициализация приложения после полной загрузки DOM
 document.addEventListener('DOMContentLoaded', () => {
     fetchDrivers();
     fetchNextRace();
     fetchLeaderboard();
+    loadTeamHistory();
     initRandomizer();
     initReactionGame();
     initMiniRaceGame();
@@ -14,11 +15,15 @@ document.addEventListener('DOMContentLoaded', () => {
 // 1. Таймер обратного отсчета Гран-при
 async function fetchNextRace() {
     try {
-        const res = await fetch(`${API_URL}/next-race`);
+        const res = await fetch('/api/next-race');
+        if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
         const race = await res.json();
 
-        document.getElementById('race-title').innerText = `${race.title} (${race.circuit})`;
-        document.getElementById('race-location').innerText = `📍 ${race.location}`;
+        const titleEl = document.getElementById('race-title');
+        const locEl = document.getElementById('race-location');
+
+        if (titleEl) titleEl.innerText = `${race.title} (${race.circuit})`;
+        if (locEl) locEl.innerText = `📍 ${race.location}`;
 
         const raceDate = new Date(race.race_time).getTime();
 
@@ -33,21 +38,51 @@ async function fetchNextRace() {
             const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
             const seconds = Math.floor((diff % (1000 * 60)) / 1000);
 
-            document.getElementById('timer-days').innerText = String(days).padStart(2, '0');
-            document.getElementById('timer-hours').innerText = String(hours).padStart(2, '0');
-            document.getElementById('timer-minutes').innerText = String(minutes).padStart(2, '0');
-            document.getElementById('timer-seconds').innerText = String(seconds).padStart(2, '0');
+            const dEl = document.getElementById('timer-days');
+            const hEl = document.getElementById('timer-hours');
+            const mEl = document.getElementById('timer-minutes');
+            const sEl = document.getElementById('timer-seconds');
+
+            if (dEl) dEl.innerText = String(days).padStart(2, '0');
+            if (hEl) hEl.innerText = String(hours).padStart(2, '0');
+            if (mEl) mEl.innerText = String(minutes).padStart(2, '0');
+            if (sEl) sEl.innerText = String(seconds).padStart(2, '0');
         }, 1000);
     } catch (e) {
         console.error('Ошибка загрузки гонки:', e);
     }
 }
 
-// 2. Загрузка карточек пилотов
+// 2. История команды
+async function loadTeamHistory() {
+    const container = document.getElementById('history-timeline');
+    if (!container) return;
+
+    try {
+        const response = await fetch('/api/team-history');
+        if (!response.ok) throw new Error(`HTTP status: ${response.status}`);
+
+        const historyData = await response.json();
+
+        container.innerHTML = historyData.map(item => `
+            <div class="border-l-4 border-cyanAccent pl-4 py-3 my-4 bg-navyCard/60 rounded-r-xl border border-navyBorder shadow-lg">
+                <span class="text-cyanAccent font-bold text-sm block mb-1">${item.year}</span>
+                <h3 class="text-white font-bold text-lg mb-1">${item.title}</h3>
+                <p class="text-slate-300 text-sm leading-relaxed">${item.description}</p>
+            </div>
+        `).join('');
+    } catch (error) {
+        console.error('Ошибка загрузки истории:', error);
+    }
+}
+
+// 3. Загрузка карточек пилотов
 async function fetchDrivers() {
     const container = document.getElementById('drivers-container');
+    if (!container) return;
+
     try {
-        const response = await fetch(`${API_URL}/drivers`);
+        const response = await fetch('/api/drivers');
         if (!response.ok) throw new Error('Ошибка сети');
         driversData = await response.json();
 
@@ -80,15 +115,18 @@ async function fetchDrivers() {
         `).join('');
     } catch (err) {
         console.error(err);
-        container.innerHTML = `<div class="text-red-400">Не удалось загрузить данные с Python-сервера.</div>`;
+        container.innerHTML = `<div class="text-red-400">Не удалось загрузить данные с сервера.</div>`;
     }
 }
 
-// 3. Таблица лидеров (Leaderboard)
+// 4. Таблица лидеров (Leaderboard)
 async function fetchLeaderboard() {
     const listEl = document.getElementById('leaderboard-list');
+    if (!listEl) return;
+
     try {
-        const res = await fetch(`${API_URL}/leaderboard`);
+        const res = await fetch('/api/leaderboard');
+        if (!res.ok) throw new Error(`HTTP status: ${res.status}`);
         const leaderboard = await res.json();
 
         listEl.innerHTML = leaderboard.map((item, idx) => `
@@ -104,7 +142,7 @@ async function fetchLeaderboard() {
 
 async function saveScoreToApi(playerName, timeMs) {
     try {
-        await fetch(`${API_URL}/leaderboard`, {
+        await fetch('/api/leaderboard', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ player: playerName, time_ms: timeMs })
@@ -115,7 +153,7 @@ async function saveScoreToApi(playerName, timeMs) {
     }
 }
 
-// 4. Модальное окно
+// 5. Модальное окно пилота
 function openDriverModal(id) {
     const driver = driversData.find(d => d.id === id);
     if (!driver) return;
@@ -134,21 +172,23 @@ function openDriverModal(id) {
 function initModalEvents() {
     const modal = document.getElementById('driver-modal');
     const closeBtn = document.getElementById('close-modal-btn');
+    if (!modal || !closeBtn) return;
 
     closeBtn.addEventListener('click', () => modal.classList.add('hidden'));
     modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.add('hidden'); });
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape') modal.classList.add('hidden'); });
 }
 
-// 5. Рандомайзер болида
+// 6. Рандомайзер болида
 function initRandomizer() {
     const btn = document.getElementById('randomize-btn');
     const resultBox = document.getElementById('car-result');
+    if (!btn || !resultBox) return;
 
     btn.addEventListener('click', async () => {
         try {
             btn.innerText = '⚙️ Генерация...';
-            const response = await fetch(`${API_URL}/random-car`);
+            const response = await fetch('/api/random-car');
             const car = await response.json();
 
             document.getElementById('res-chassis').innerText = car.chassis;
@@ -166,20 +206,22 @@ function initRandomizer() {
     });
 }
 
-// 6. Игра: Тест Реакции с поддержкой Пробела и Клика
+// 7. Игра: Тест Реакции
 function initReactionGame() {
     const startBtn = document.getElementById('start-reaction-btn');
     const statusText = document.getElementById('reaction-status');
     const lights = document.querySelectorAll('.light-circle');
+    const lightsContainer = document.getElementById('lights-container');
+    if (!startBtn || !statusText || !lightsContainer) return;
+
     let startTime, timerId, intervalId;
-    let gameState = 'idle'; // 'idle', 'waiting', 'ready'
+    let gameState = 'idle'; 
 
     function resetLights() {
         lights.forEach(l => l.className = 'w-8 h-8 rounded-full bg-slate-800 light-circle');
     }
 
-    startBtn.addEventListener('click', (e) => {
-        // Убираем фокус с кнопки "Старт", чтобы нажатие Пробела не кликало на нее повторно
+    startBtn.addEventListener('click', () => {
         startBtn.blur();
 
         clearTimeout(timerId);
@@ -209,7 +251,6 @@ function initReactionGame() {
         }, 800);
     });
 
-    // Функция обработки реакции (при клике или нажатии Пробела)
     async function handleInteraction() {
         if (gameState === 'waiting') {
             clearTimeout(timerId);
@@ -234,24 +275,22 @@ function initReactionGame() {
         }
     }
 
-    // Реакция по клику на область светофоров
-    document.getElementById('lights-container').addEventListener('click', handleInteraction);
+    lightsContainer.addEventListener('click', handleInteraction);
 
-    // Реакция по нажатию на клавишу ПРОБЕЛ
     document.addEventListener('keydown', (e) => {
         if (e.code === 'Space') {
-            // Предотвращаем стандартную прокрутку страницы от пробела
-            e.preventDefault(); 
             if (gameState === 'waiting' || gameState === 'ready') {
+                e.preventDefault(); 
                 handleInteraction();
             }
         }
     });
 }
 
-// 7. Мини-гонка на Canvas
+// 8. Мини-гонка на Canvas
 function initMiniRaceGame() {
     const canvas = document.getElementById('raceCanvas');
+    if (!canvas) return;
     const ctx = canvas.getContext('2d');
     const startBtn = document.getElementById('start-race-btn');
     const scoreText = document.getElementById('race-score');
@@ -323,51 +362,28 @@ function initMiniRaceGame() {
         cancelAnimationFrame(gameLoopId);
         isRunning = false;
         alert(`💥 Столкновение! Ваш счет: ${score}`);
-        startBtn.innerText = 'Играть снова';
+        if (startBtn) startBtn.innerText = 'Играть снова';
     }
 
-    startBtn.addEventListener('click', () => {
-        if (isRunning) return;
-        isRunning = true;
-        score = 0;
-        player.x = 120;
-        obstacles = [];
-        scoreText.innerText = 'Счет: 0';
-        update();
-    });
+    if (startBtn) {
+        startBtn.addEventListener('click', () => {
+            if (isRunning) return;
+            isRunning = true;
+            score = 0;
+            player.x = 120;
+            obstacles = [];
+            scoreText.innerText = 'Счет: 0';
+            update();
+        });
+    }
 
     document.addEventListener('keydown', (e) => {
         if (!isRunning) return;
-        if ((e.key === 'ArrowLeft' || e.key === 'a') && player.x > 15) {
+        if ((e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A' || e.key === 'ф' || e.key === 'Ф') && player.x > 15) {
             player.x -= 25;
         }
-        if ((e.key === 'ArrowRight' || e.key === 'd') && player.x < canvas.width - 50) {
+        if ((e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D' || e.key === 'в' || e.key === 'В') && player.x < canvas.width - 50) {
             player.x += 25;
         }
     });
 }
-
-async function loadTeamHistory() {
-    try {
-      const response = await fetch('/api/team-history');
-      const history = await response.json();
-      
-      const container = document.getElementById('history-timeline');
-      container.innerHTML = history.map(item => `
-        <div class="timeline-item">
-          <div class="timeline-year">${item.year}</div>
-          <div class="timeline-content">
-            <h3>${item.title}</h3>
-            <p>${item.description}</p>
-          </div>
-        </div>
-      `).join('');
-    } catch (error) {
-      console.error('Ошибка загрузки истории команды:', error);
-    }
-  }
-  
-  // Вызов функции при загрузке страницы
-  document.addEventListener('DOMContentLoaded', () => {
-    loadTeamHistory();
-  });

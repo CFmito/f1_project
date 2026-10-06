@@ -1,25 +1,42 @@
-/* Плавный скролл */
-html {
+/* ==========================================
+   1. Плавный скролл и системные настройки
+   ========================================== */
+   html {
     scroll-behavior: smooth;
   }
   
-  /* Кастомный скроллбар в тёмно-синих тонах */
+  /* ==========================================
+     2. Кастомный скроллбар (Chrome, Edge, Safari, Firefox)
+     ========================================== */
+  /* Для Firefox */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: #1e293b #0a0f1d;
+  }
+  
+  /* Для Webkit (Chrome, Safari, Edge) */
   ::-webkit-scrollbar {
     width: 8px;
   }
+  
   ::-webkit-scrollbar-track {
     background: #0a0f1d;
   }
+  
   ::-webkit-scrollbar-thumb {
     background: #1e293b;
     border-radius: 4px;
   }
+  
   ::-webkit-scrollbar-thumb:hover {
     background: #00d2ff;
   }
-
+  
+  /* ==========================================
+     3. Секция истории команды (Timeline)
+     ========================================== */
   .history-section {
-    padding: 2rem;
+    padding: 2rem 0;
     max-width: 900px;
     margin: 0 auto;
   }
@@ -35,26 +52,68 @@ html {
   
   .timeline-item {
     position: relative;
-    background: #1e1e24;
-    border-radius: 8px;
+    background: #111827;
+    border: 1px solid #1f2937;
+    border-radius: 12px;
     padding: 1.2rem;
     color: #fff;
+    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+  
+  /* Круглая точка на линии таймлайна */
+  .timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -1.95rem;
+    top: 1.5rem;
+    width: 12px;
+    height: 12px;
+    background-color: #00d2be;
+    border: 3px solid #0b0f19;
+    border-radius: 50%;
+    box-shadow: 0 0 8px rgba(0, 210, 190, 0.6);
+  }
+  
+  .timeline-item:hover {
+    border-color: #00d2ff;
+    transform: translateX(4px);
+    box-shadow: 0 4px 20px rgba(0, 210, 255, 0.1);
   }
   
   .timeline-year {
-    font-size: 1.2rem;
-    font-weight: bold;
-    color: #00d2be;
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: #00d2ff;
     margin-bottom: 0.3rem;
   }
   
   .timeline-content h3 {
     margin: 0 0 0.5rem 0;
-    font-size: 1.1rem;
+    font-size: 1.2rem;
+    font-weight: 700;
   }
   
   .timeline-content p {
     margin: 0;
-    color: #ccc;
-    line-height: 1.4;
+    color: #94a3b8;
+    line-height: 1.5;
+    font-size: 0.95rem;
+  }
+  
+  /* ==========================================
+     4. Анимации и вспомогательные стили
+     ========================================== */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+  
+  .animate-fadeIn {
+    animation: fadeIn 0.25s ease-out forwards;
   }
