@@ -65,10 +65,12 @@ async function loadTeamHistory() {
         const historyData = await response.json();
 
         container.innerHTML = historyData.map(item => `
-            <div class="border-l-4 border-cyanAccent pl-4 py-3 my-4 bg-navyCard/60 rounded-r-xl border border-navyBorder shadow-lg">
-                <span class="text-cyanAccent font-bold text-sm block mb-1">${item.year}</span>
-                <h3 class="text-white font-bold text-lg mb-1">${item.title}</h3>
-                <p class="text-slate-300 text-sm leading-relaxed">${item.description}</p>
+            <div class="timeline-item">
+                <div class="timeline-year">${item.year}</div>
+                <div class="timeline-content">
+                    <h3>${item.title}</h3>
+                    <p>${item.description}</p>
+                </div>
             </div>
         `).join('');
     } catch (error) {
@@ -201,7 +203,7 @@ function initRandomizer() {
         } catch (err) {
             alert('Ошибка обращения к Python API');
         } finally {
-            btn.innerText = '🏎️ Собрать болид';
+            btn.innerText = '🏎️️ Собрать болид';
         }
     });
 }

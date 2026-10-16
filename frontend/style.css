@@ -8,13 +8,11 @@
   /* ==========================================
      2. Кастомный скроллбар (Chrome, Edge, Safari, Firefox)
      ========================================== */
-  /* Для Firefox */
   * {
     scrollbar-width: thin;
     scrollbar-color: #1e293b #0a0f1d;
   }
   
-  /* Для Webkit (Chrome, Safari, Edge) */
   ::-webkit-scrollbar {
     width: 8px;
   }
@@ -41,18 +39,30 @@
     width: 100%;
   }
   
-  .timeline {
+  /* Заголовок растягивается на всю ширину */
+  .history-section h2 {
+    width: 100%;
+    text-align: left;
+  }
+  
+  /* Контейнер таймлайна с фиксированной шириной и центрированием */
+  .timeline,
+  #history-timeline {
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
-    border-left: 3px solid #00d2be; /* Фирменный бирюзовый цвет Mercedes */
+    border-left: 3px solid #00d2be;
     padding-left: 1.5rem;
-    margin-top: 1rem;
-    width: 100%;
+    margin: 1.5rem auto 0 auto !important;
+    max-width: 800px !important;
+    width: 100% !important;
     box-sizing: border-box;
+    position: relative;
   }
   
-  .timeline-item {
+  /* Карточки таймлайна */
+  .timeline-item,
+  #history-timeline > div {
     position: relative;
     background: #111827;
     border: 1px solid #1f2937;
@@ -62,10 +72,16 @@
     transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
     width: 100%;
     box-sizing: border-box;
+  
+    /* Анимация проявления при скролле (CSS Scroll-Driven Animations) */
+    animation: scrollReveal ease-out both;
+    animation-timeline: view();
+    animation-range: entry 10% cover 30%;
   }
   
-  /* Круглая точка на линии таймлайна */
-  .timeline-item::before {
+  /* Точка на линии */
+  .timeline-item::before,
+  #history-timeline > div::before {
     content: '';
     position: absolute;
     left: -1.95rem;
@@ -78,7 +94,8 @@
     box-shadow: 0 0 8px rgba(0, 210, 190, 0.6);
   }
   
-  .timeline-item:hover {
+  .timeline-item:hover,
+  #history-timeline > div:hover {
     border-color: #00d2ff;
     transform: translateX(4px);
     box-shadow: 0 4px 20px rgba(0, 210, 255, 0.1);
@@ -104,12 +121,16 @@
     font-size: 0.95rem;
   }
   
-  /* Дополнительные сбросы на случай перебивания Tailwind-классами или JS-генерацией */
-  #history-timeline,
-  #history-timeline > div {
-    width: 100% !important;
-    max-width: 100% !important;
-    box-sizing: border-box;
+  /* Keyframes для плавного взлёта карточек */
+  @keyframes scrollReveal {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
   
   /* ==========================================
