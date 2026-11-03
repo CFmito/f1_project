@@ -1,4 +1,6 @@
 let driversData = [];
+let videosData = [];
+let currentVideoCategory = 'history'; // Категория по умолчанию - История
 
 // Главная инициализация приложения после полной загрузки DOM
 document.addEventListener('DOMContentLoaded', () => {
@@ -6,6 +8,8 @@ document.addEventListener('DOMContentLoaded', () => {
     fetchNextRace();
     fetchLeaderboard();
     loadTeamHistory();
+    fetchVideos();          // Загрузка видео с бэкенда
+    initVideoModalEvents(); // Инициализация модального окна видео
     initRandomizer();
     initReactionGame();
     initMiniRaceGame();
@@ -203,7 +207,7 @@ function initRandomizer() {
         } catch (err) {
             alert('Ошибка обращения к Python API');
         } finally {
-            btn.innerText = '🏎️️ Собрать болид';
+            btn.innerText = '🏎 Собрать болид';
         }
     });
 }
@@ -388,4 +392,124 @@ function initMiniRaceGame() {
             player.x += 25;
         }
     });
+}
+
+// 9. Загрузка и управление видео
+async function fetchVideos() {
+    const container = document.getElementById('videos-container');
+    if (!container) return;
+
+    try {
+        const res = await fetch('/api/videos');
+        if (!res.ok) throw new Error('Ошибка загрузки видео');
+        videosData = await res.json();
+        renderVideos();
+    } catch (err) {
+        console.error('Ошибка загрузки видео:', err);
+        container.innerHTML = `<div class="text-red-400 text-sm">Не удалось загрузить видео.</div>`;
+    }
+}
+
+function renderVideos() {
+    const container = document.getElementById('videos-container');
+    if (!container) return;
+
+    const filtered = currentVideoCategory === 'all' 
+        ? videosData 
+        : videosData.filter(v => v.category === currentVideoCategory);
+
+    container.innerHTML = filtered.map(v => {
+        const isShorts = v.category === 'edits';
+        const aspectClass = isShorts ? 'aspect-[9/16]' : 'aspect-video';
+        
+        return `
+            <div onclick="openVideoModal('${v.id}')" class="bg-navyCard border border-navyBorder rounded-2xl overflow-hidden hover:border-cyanAccent transition group cursor-pointer shadow-lg flex flex-col justify-between">
+                <div class="relative ${aspectClass} overflow-hidden bg-slate-900">
+                    <img src="${v.thumbnail}" alt="${v.title}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500 opacity-80 group-hover:opacity-100">
+                    <div class="absolute inset-0 flex items-center justify-center">
+                        <div class="w-12 h-12 rounded-full bg-cyanAccent/90 text-black flex items-center justify-center pl-1 font-bold text-xl group-hover:scale-110 transition shadow-lg">
+                            ▶
+                        </div>
+                    </div>
+                </div>
+                <div class="p-4">
+                    <h3 class="text-white font-bold text-base group-hover:text-cyanAccent transition mb-1">${v.title}</h3>
+                    <p class="text-slate-400 text-xs line-clamp-2">${v.desc}</p>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+function filterVideos(category) {
+    currentVideoCategory = category;
+
+    document.querySelectorAll('.video-tab').forEach(btn => {
+        btn.classList.remove('bg-cyanAccent', 'text-black', 'font-bold');
+        btn.classList.add('bg-navyCard', 'text-slate-300', 'border', 'border-navyBorder');
+    });
+
+    if (window.event && window.event.currentTarget) {
+        window.event.currentTarget.classList.remove('bg-navyCard', 'text-slate-300', 'border', 'border-navyBorder');
+        window.event.currentTarget.classList.add('bg-cyanAccent', 'text-black', 'font-bold');
+    }
+
+    renderVideos();
+}
+
+function openVideoModal(id) {
+    const video = videosData.find(v => v.id === id);
+    if (!video) return;
+
+    const playerContainer = document.getElementById('video-player-container');
+    const modalContainer = document.querySelector('#video-modal > div');
+    document.getElementById('modal-video-title').innerText = video.title;
+    document.getElementById('modal-video-desc').innerText = video.desc;
+
+    // Автоматическая адаптация формы модального окна под тип видео
+    if (video.category === 'edits') {
+        modalContainer.className = "bg-navyCard border border-navyBorder rounded-3xl w-full max-w-[360px] overflow-hidden shadow-2xl relative flex flex-col items-center";
+        playerContainer.className = "w-full aspect-[9/16] max-h-[70vh] bg-black flex items-center justify-center relative overflow-hidden";
+    } else {
+        modalContainer.className = "bg-navyCard border border-navyBorder rounded-2xl w-full max-w-3xl overflow-hidden shadow-2xl relative flex flex-col items-center";
+        playerContainer.className = "w-full aspect-video bg-black flex items-center justify-center relative overflow-hidden";
+    }
+
+    if (video.type === 'youtube') {
+        playerContainer.innerHTML = `
+            <iframe 
+                class="w-full h-full" 
+                src="${video.src}?autoplay=1&controls=1&rel=0&enablejsapi=1" 
+                title="${video.title}" 
+                frameborder="0" 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                allowfullscreen>
+            </iframe>
+        `;
+    } else {
+        playerContainer.innerHTML = `
+            <video controls autoplay class="w-full h-full object-cover">
+                <source src="${video.src}" type="video/mp4">
+            </video>
+        `;
+    }
+
+    document.getElementById('video-modal').classList.remove('hidden');
+}
+
+function closeVideoModal() {
+    const modal = document.getElementById('video-modal');
+    const playerContainer = document.getElementById('video-player-container');
+    if (modal) modal.classList.add('hidden');
+    if (playerContainer) playerContainer.innerHTML = '';
+}
+
+function initVideoModalEvents() {
+    const modal = document.getElementById('video-modal');
+    const closeBtn = document.getElementById('close-video-modal');
+    if (!modal || !closeBtn) return;
+
+    closeBtn.addEventListener('click', closeVideoModal);
+    modal.addEventListener('click', (e) => { if (e.target === modal) closeVideoModal(); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeVideoModal(); });
 }

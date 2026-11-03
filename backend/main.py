@@ -94,29 +94,46 @@ TEAM_HISTORY = [
     }
 ]
 
-@app.get("/api/drivers")
-def get_drivers():
-    return DRIVERS
-
-@app.get("/api/team-history")
-def get_team_history():
-    return TEAM_HISTORY
-
-@app.get("/api/random-car")
-def get_random_car():
-    chassis_list = ["Mercedes W16", "Ferrari SF-25", "McLaren MCL39", "Red Bull RB21"]
-    engine_list = ["Mercedes-AMG V6", "Ferrari V6 Turbo", "Honda RBPT", "Renault E-Tech"]
-    tyres_list = ["Soft (C5 - Красные)", "Medium (C3 - Жёлтые)", "Hard (C1 - Белые)", "Intermediate (Зелёные)"]
-    strategy_list = ["Plan A: Undercut", "Plan B: Soft-Medium-Soft", "Hammer Time / Attack", "Box, Box for Fastest Lap"]
-
-    return {
-        "chassis": random.choice(chassis_list),
-        "engine": random.choice(engine_list),
-        "tyres": random.choice(tyres_list),
-        "strategy": random.choice(strategy_list),
-        "score": random.randint(75, 99)
+# База данных видео и эдитов с реальными видео о F1
+# База данных видео и эдитов с вашими YouTube Shorts
+VIDEOS_DATA = [
+    {
+        "id": "v1",
+        "category": "history",
+        "title": "Обзор команды Mercedes F1",
+        "desc": "Официальное видео про историю и жизнь команды Mercedes AMG Petronas.",
+        "thumbnail": "https://img.youtube.com/vi/o5v8WOh5qPs/hqdefault.jpg",
+        "type": "youtube",
+        "src": "https://www.youtube.com/embed/o5v8WOh5qPs"
+    },
+    {
+        "id": "v2",
+        "category": "edits",
+        "title": "Эдит про Джорджа Рассела",
+        "desc": "Лучшие моменты, скорость и стиль пилота под номером 63.",
+        "thumbnail": "https://img.youtube.com/vi/iIUiChvhAjU/hqdefault.jpg",
+        "type": "youtube",
+        "src": "https://www.youtube.com/embed/iIUiChvhAjU"
+    },
+    {
+        "id": "v3",
+        "category": "edits",
+        "title": "Эдит про Кими Антонелли",
+        "desc": "Молодой восходящий талант и скорость итальянского пилота.",
+        "thumbnail": "https://img.youtube.com/vi/LDy94kVRLzE/hqdefault.jpg",
+        "type": "youtube",
+        "src": "https://www.youtube.com/embed/LDy94kVRLzE"
+    },
+    {
+        "id": "v4",
+        "category": "edits",
+        "title": "Эдит про Льюиса Хэмилтона",
+        "desc": "Легендарные моменты семикратного чемпиона мира в Mercedes.",
+        "thumbnail": "https://img.youtube.com/vi/MtTVtaA9W0I/hqdefault.jpg",
+        "type": "youtube",
+        "src": "https://www.youtube.com/embed/MtTVtaA9W0I"
     }
-
+]
 F1_SCHEDULE = [
     {
         "title": "Гран-при Сингапура",
@@ -162,6 +179,35 @@ F1_SCHEDULE = [
     }
 ]
 
+# --- API ENDPOINTS ---
+
+@app.get("/api/drivers")
+def get_drivers():
+    return DRIVERS
+
+@app.get("/api/team-history")
+def get_team_history():
+    return TEAM_HISTORY
+
+@app.get("/api/videos")
+def get_videos():
+    return VIDEOS_DATA
+
+@app.get("/api/random-car")
+def get_random_car():
+    chassis_list = ["Mercedes W16", "Ferrari SF-25", "McLaren MCL39", "Red Bull RB21"]
+    engine_list = ["Mercedes-AMG V6", "Ferrari V6 Turbo", "Honda RBPT", "Renault E-Tech"]
+    tyres_list = ["Soft (C5 - Красные)", "Medium (C3 - Жёлтые)", "Hard (C1 - Белые)", "Intermediate (Зелёные)"]
+    strategy_list = ["Plan A: Undercut", "Plan B: Soft-Medium-Soft", "Hammer Time / Attack", "Box, Box for Fastest Lap"]
+
+    return {
+        "chassis": random.choice(chassis_list),
+        "engine": random.choice(engine_list),
+        "tyres": random.choice(tyres_list),
+        "strategy": random.choice(strategy_list),
+        "score": random.randint(75, 99)
+    }
+
 @app.get("/api/next-race")
 def get_next_race():
     now = datetime.now(timezone.utc)
@@ -185,5 +231,6 @@ def save_score(score: ScoreRequest):
     LEADERBOARD.append({"player": score.player, "time_ms": score.time_ms})
     return {"status": "success"}
 
+# Мнтирование фронтенда ДОЛЖНО быть строкой НИЖЕ ВСЕХ @app.get роутов
 if os.path.exists(FRONTEND_DIR):
     app.mount("/", StaticFiles(directory=FRONTEND_DIR, html=True), name="frontend")

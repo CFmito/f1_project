@@ -35,6 +35,7 @@
         <h1 class="text-xl font-black tracking-wider text-white">MERCEDES & F1 HUB</h1>
       </div>
       <nav class="hidden md:flex gap-6 text-sm font-semibold text-slate-300">
+        <a href="#media" class="hover:text-cyanAccent transition">Медиа</a>
         <a href="#history" class="hover:text-cyanAccent transition">История</a>
         <a href="#drivers" class="hover:text-cyanAccent transition">Пилоты</a>
         <a href="#randomizer" class="hover:text-cyanAccent transition">Рандомайзер</a>
@@ -46,47 +47,71 @@
   <!-- Основной контент -->
   <main class="max-w-7xl mx-auto px-6 py-10 w-full flex-grow">
 
-    <!-- Виджет ближайшего Гран-при -->
-    <section class="mb-12 bg-gradient-to-r from-blue-900/40 to-navyCard border border-cyanAccent/30 rounded-2xl p-6 shadow-2xl relative overflow-hidden">
+    <!-- 1. Виджет ближайшего Гран-при -->
+    <section class="mb-12 bg-gradient-to-r from-blue-900/40 to-navyCard border border-cyanAccent/30 rounded-2xl p-6 sm:p-8 shadow-2xl relative overflow-hidden">
       <div class="flex flex-col md:flex-row justify-between items-center gap-6">
         <div>
-          <span class="text-xs font-bold text-cyanAccent uppercase tracking-widest">🏎️️ БЛИЖАЙШИЙ ЭТАП F1</span>
-          <h2 id="race-title" class="text-3xl font-extrabold text-white mt-1">Загрузка...</h2>
+          <span class="text-xs font-bold text-cyanAccent uppercase tracking-widest block mb-1">🏎 БЛИЖАЙШИЙ ЭТАП F1</span>
+          <h2 id="race-title" class="text-2xl sm:text-3xl font-extrabold text-white">Загрузка...</h2>
           <p id="race-location" class="text-slate-400 text-sm mt-1">📍 ...</p>
         </div>
 
         <!-- Обратный отсчет -->
-        <div class="flex gap-4 text-center">
-          <div class="bg-navyBg/80 border border-navyBorder px-4 py-2 rounded-xl min-w-[70px]">
+        <div class="flex gap-3 text-center">
+          <div class="bg-navyBg/80 border border-navyBorder px-3.5 py-2 rounded-xl min-w-[65px]">
             <span id="timer-days" class="text-2xl font-black text-cyanAccent block">00</span>
-            <span class="text-[10px] text-slate-400 uppercase">Дней</span>
+            <span class="text-[10px] text-slate-400 font-semibold uppercase">Дней</span>
           </div>
-          <div class="bg-navyBg/80 border border-navyBorder px-4 py-2 rounded-xl min-w-[70px]">
+          <div class="bg-navyBg/80 border border-navyBorder px-3.5 py-2 rounded-xl min-w-[65px]">
             <span id="timer-hours" class="text-2xl font-black text-cyanAccent block">00</span>
-            <span class="text-[10px] text-slate-400 uppercase">Часов</span>
+            <span class="text-[10px] text-slate-400 font-semibold uppercase">Часов</span>
           </div>
-          <div class="bg-navyBg/80 border border-navyBorder px-4 py-2 rounded-xl min-w-[70px]">
+          <div class="bg-navyBg/80 border border-navyBorder px-3.5 py-2 rounded-xl min-w-[65px]">
             <span id="timer-minutes" class="text-2xl font-black text-cyanAccent block">00</span>
-            <span class="text-[10px] text-slate-400 uppercase">Мин</span>
+            <span class="text-[10px] text-slate-400 font-semibold uppercase">Мин</span>
           </div>
-          <div class="bg-navyBg/80 border border-navyBorder px-4 py-2 rounded-xl min-w-[70px]">
+          <div class="bg-navyBg/80 border border-navyBorder px-3.5 py-2 rounded-xl min-w-[65px]">
             <span id="timer-seconds" class="text-2xl font-black text-cyanAccent block">00</span>
-            <span class="text-[10px] text-slate-400 uppercase">Сек</span>
+            <span class="text-[10px] text-slate-400 font-semibold uppercase">Сек</span>
           </div>
         </div>
       </div>
     </section>
+<!-- 2. Секция Медиа и Эдитов -->
+<section id="media" class="w-full mb-16">
+  <!-- Заголовок во всю ширину -->
+  <h2 class="text-3xl font-extrabold text-white mb-6 border-l-4 border-cyanAccent pl-4 flex items-center gap-2">
+    <span>🎬</span> Медиа и Эдиты
+  </h2>
 
-    <!-- Секция истории команды -->
-   <!-- ИСПРАВЛЕННЫЙ ВАРИАНТ: container без max-w-* лимитов -->
-<section id="history" class="history-section w-full">
-  <h2 class="text-3xl font-extrabold text-white mb-6 border-l-4 border-cyanAccent pl-4">История команды</h2>
-  <div id="history-timeline" class="timeline w-full">
+  <!-- Контейнер на всю ширину -->
+  <div class="w-full mx-auto">
+    <!-- Переключатель категорий (Остались только История и Эдиты) -->
+    <div class="flex gap-2 mb-6 overflow-x-auto pb-2 scrollbar-none">
+      <button onclick="filterVideos('history')" class="video-tab active bg-cyanAccent text-black font-bold px-4 py-2 rounded-xl text-sm transition cursor-pointer">
+        История
+      </button>
+      <button onclick="filterVideos('edits')" class="video-tab bg-navyCard text-slate-300 hover:text-white border border-navyBorder font-semibold px-4 py-2 rounded-xl text-sm transition cursor-pointer">
+        Эдиты
+      </button>
+    </div>
+
+    <!-- Сетка превью видео на всю ширину (адаптивная: 1, 2, 3 или 4 колонки) -->
+    <div id="videos-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
       <!-- Карточки рендерятся через JS -->
+    </div>
   </div>
 </section>
 
-    <!-- Секция пилотов -->
+    <!-- 3. Секция истории команды -->
+    <section id="history" class="history-section w-full mb-16">
+      <h2 class="text-3xl font-extrabold text-white mb-6 border-l-4 border-cyanAccent pl-4">История команды</h2>
+      <div id="history-timeline" class="timeline w-full">
+        <!-- Карточки рендерятся через JS -->
+      </div>
+    </section>
+
+    <!-- 4. Секция пилотов -->
     <section id="drivers" class="mb-16">
       <h2 class="text-3xl font-extrabold text-white mb-8 border-l-4 border-cyanAccent pl-4">Пилоты команды</h2>
       <div id="drivers-container" class="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -94,7 +119,7 @@
       </div>
     </section>
 
-    <!-- Секция Рандомайзера болида -->
+    <!-- 5. Секция Рандомайзера болида -->
     <section id="randomizer" class="mb-16 bg-navyCard border border-navyBorder rounded-2xl p-8 shadow-xl">
       <div class="max-w-2xl mx-auto text-center">
         <h2 class="text-3xl font-extrabold text-white mb-2">⚙️ Генератор сетапа болида</h2>
@@ -120,7 +145,7 @@
       </div>
     </section>
 
-    <!-- Секция Игр -->
+    <!-- 6. Секция Игр -->
     <section id="games" class="mb-16">
       <h2 class="text-3xl font-extrabold text-white mb-8 border-l-4 border-cyanAccent pl-4">Интерактивные Игры</h2>
       
@@ -179,6 +204,26 @@
 
   </main>
 
+  <!-- Модальное окно плеера видео -->
+  <div id="video-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-navyCard border border-navyBorder rounded-2xl w-full max-w-3xl overflow-hidden shadow-2xl relative">
+      
+      <button id="close-video-modal" class="absolute top-3 right-3 z-10 bg-black/60 text-white hover:text-cyanAccent w-9 h-9 rounded-full flex items-center justify-center text-xl transition cursor-pointer">
+        ✕
+      </button>
+
+      <div id="video-player-container" class="w-full aspect-video bg-black flex items-center justify-center">
+        <!-- iframe или video вставляется через JS -->
+      </div>
+
+      <div class="p-4 bg-navyCard">
+        <h3 id="modal-video-title" class="text-white font-bold text-lg mb-1"></h3>
+        <p id="modal-video-desc" class="text-slate-400 text-sm"></p>
+      </div>
+
+    </div>
+  </div>
+
   <!-- Модальное окно пилота -->
   <div id="driver-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="bg-navyCard border border-navyBorder rounded-2xl max-w-2xl w-full overflow-hidden shadow-2xl relative animate-fadeIn">
@@ -214,8 +259,7 @@
     <p>© 2026 Mercedes & F1 Fan Hub. Разработано для демонстрационного проекта.</p>
   </footer>
 
-  <!-- Подключение JS скрипта из корня frontend -->
-  <script src="app.js?v=2"></script>
-  <link rel="stylesheet" href="style.css?v=2">
+  <!-- Подключение JS и CSS скриптов -->
+  <script src="app.js?v=3"></script>
 </body>
 </html>
