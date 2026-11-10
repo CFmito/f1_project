@@ -418,12 +418,68 @@ function renderVideos() {
         ? videosData 
         : videosData.filter(v => v.category === currentVideoCategory);
 
+    if (currentVideoCategory === 'history') {
+        container.className = "w-full";
+    } else {
+        container.className = "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6";
+    }
+
     container.innerHTML = filtered.map(v => {
         const isShorts = v.category === 'edits';
         const aspectClass = isShorts ? 'aspect-[9/16]' : 'aspect-video';
         
+        // Премиальный вид для основного видео «Истории»
+        if (v.category === 'history') {
+            return `
+                <div onclick="openVideoModal('${v.id}')" class="bg-navyCard border border-navyBorder rounded-3xl overflow-hidden hover:border-cyanAccent transition-all duration-300 group cursor-pointer shadow-2xl flex flex-col lg:flex-row w-full">
+                    
+                    <!-- Блок с превью (60% ширины) -->
+                    <div class="relative w-full lg:w-3/5 aspect-video overflow-hidden bg-slate-900">
+                        <img src="${v.thumbnail}" alt="${v.title}" class="w-full h-full object-cover group-hover:scale-105 transition duration-700 opacity-90 group-hover:opacity-100">
+                        
+                        <!-- Градиентное затемнение снизу/сбоку -->
+                        <div class="absolute inset-0 bg-gradient-to-t from-navyCard/80 via-transparent to-transparent lg:bg-gradient-to-r lg:from-transparent lg:to-navyCard/60"></div>
+
+                        <!-- Кнопка Play в центре -->
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <div class="w-16 h-16 rounded-full bg-cyanAccent text-navyBg flex items-center justify-center pl-1 font-black text-2xl group-hover:scale-110 transition duration-300 shadow-xl shadow-cyanAccent/20">
+                                ▶
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Блок с информацией (40% ширины) -->
+                    <div class="p-8 lg:w-2/5 flex flex-col justify-between bg-navyCard">
+                        <div>
+                            <div class="flex items-center gap-2 mb-3">
+                                <span class="bg-cyanAccent/10 text-cyanAccent border border-cyanAccent/30 text-[11px] font-bold px-3 py-1 rounded-full uppercase tracking-widest">
+                                    ⭐ Главное видео
+                                </span>
+                            </div>
+                            
+                            <h3 class="text-white font-black text-2xl lg:text-3xl group-hover:text-cyanAccent transition duration-300 mb-4 leading-tight">
+                                ${v.title}
+                            </h3>
+                            
+                            <p class="text-slate-300 text-sm sm:text-base leading-relaxed mb-6 font-normal">
+                                ${v.desc}
+                            </p>
+                        </div>
+
+                        <!-- Кнопка действия внизу -->
+                        <div class="pt-4 border-t border-navyBorder flex items-center text-cyanAccent font-bold text-sm group-hover:translate-x-1 transition duration-300">
+                            <span>Смотреть обзор</span>
+                            <span class="ml-2 text-lg">→</span>
+                        </div>
+                    </div>
+
+                </div>
+            `;
+        }
+        
+        // Карточки для «Эдитов»
         return `
-            <div onclick="openVideoModal('${v.id}')" class="bg-navyCard border border-navyBorder rounded-2xl overflow-hidden hover:border-cyanAccent transition group cursor-pointer shadow-lg flex flex-col justify-between">
+            <div onclick="openVideoModal('${v.id}')" class="bg-navyCard border border-navyBorder rounded-2xl overflow-hidden hover:border-cyanAccent transition duration-300 group cursor-pointer shadow-lg flex flex-col justify-between">
                 <div class="relative ${aspectClass} overflow-hidden bg-slate-900">
                     <img src="${v.thumbnail}" alt="${v.title}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500 opacity-80 group-hover:opacity-100">
                     <div class="absolute inset-0 flex items-center justify-center">
@@ -466,7 +522,7 @@ function openVideoModal(id) {
     document.getElementById('modal-video-title').innerText = video.title;
     document.getElementById('modal-video-desc').innerText = video.desc;
 
-    // Автоматическая адаптация формы модального окна под тип видео
+    // Адаптация формы модального окна под тип видео
     if (video.category === 'edits') {
         modalContainer.className = "bg-navyCard border border-navyBorder rounded-3xl w-full max-w-[360px] overflow-hidden shadow-2xl relative flex flex-col items-center";
         playerContainer.className = "w-full aspect-[9/16] max-h-[70vh] bg-black flex items-center justify-center relative overflow-hidden";

@@ -102,9 +102,9 @@ VIDEOS_DATA = [
         "category": "history",
         "title": "Обзор команды Mercedes F1",
         "desc": "Официальное видео про историю и жизнь команды Mercedes AMG Petronas.",
-        "thumbnail": "https://img.youtube.com/vi/o5v8WOh5qPs/hqdefault.jpg",
+        "thumbnail": "https://img.youtube.com/vi/RhqB-wLfVwQ/hqdefault.jpg",
         "type": "youtube",
-        "src": "https://www.youtube.com/embed/o5v8WOh5qPs"
+        "src": "https://www.youtube.com/embed/RhqB-wLfVwQ"
     },
     {
         "id": "v2",
