@@ -1,0 +1,9 @@
+[build]
+  publish = "frontend"
+  command = ""
+
+[[redirects]]
+  from = "/api/*"
+  to = "https://ваш-бэкенд-на-render.com/api/:splat"
+  status = 200
+  force = true

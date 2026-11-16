@@ -26,12 +26,17 @@ if os.path.exists(STATIC_DIR):
 LEADERBOARD = [
     {"player": "Max_V", "time_ms": 195},
     {"player": "Charles_16", "time_ms": 210},
-    {"player": "Speedy", "time_ms": 235}
+    {"player": "Speedy", "time_ms": 235},
+    {"player": "Lando_4", "time_ms": 250},
+    {"player": "Oscar_81", "time_ms": 270}
 ]
 
 class ScoreRequest(BaseModel):
     player: str
     time_ms: int
+
+class ChatRequest(BaseModel):
+    message: str
 
 DRIVERS = [
     {
@@ -39,9 +44,11 @@ DRIVERS = [
         "name": "Lewis Hamilton",
         "number": 44,
         "team": "Scuderia Ferrari / Mercedes",
-        "bio": "Семикратный чемпион мира, рекордсмен по количеству побед и поулов в истории Формулы-1. Легенда автоспорта.",
+        "bio": "Семикратный чемпион мира, легенда автоспорта, рекордсмен по победам и поулам.",
         "podiums": 207,
         "world_titles": 7,
+        "wins": 105,
+        "poles": 104,
         "image_url": "/static/lh44.jpg"
     },
     {
@@ -49,9 +56,11 @@ DRIVERS = [
         "name": "Kimi Antonelli",
         "number": 12,
         "team": "Mercedes-AMG Petronas",
-        "bio": "Молодой восходящий феномен итальянского автоспорта, прошедший стремительный путь через юниорские серии прямо в состав Mercedes.",
-        "podiums": 15,
+        "bio": "Молодой восходящий феномен итальянского автоспорта, стремительно ворвавшийся в основной состав Mercedes.",
+        "podiums": 2,
         "world_titles": 0,
+        "wins": 0,
+        "poles": 1,
         "image_url": "/static/ka12.jpg"
     },
     {
@@ -59,9 +68,11 @@ DRIVERS = [
         "name": "George Russell",
         "number": 63,
         "team": "Mercedes-AMG Petronas",
-        "bio": "Победитель Гран-при, известнейший своим аналитическим подходом к гонкам, выдержкой и высокой скоростью в квалификациях.",
-        "podiums": 31,
+        "bio": "Победитель Гран-при, мастер квалификаций и лидер команды с аналитическим подходом к гонкам.",
+        "podiums": 16,
         "world_titles": 0,
+        "wins": 3,
+        "poles": 4,
         "image_url": "/static/gr63.jpg"
     }
 ]
@@ -94,8 +105,6 @@ TEAM_HISTORY = [
     }
 ]
 
-# База данных видео и эдитов с реальными видео о F1
-# База данных видео и эдитов с вашими YouTube Shorts
 VIDEOS_DATA = [
     {
         "id": "v1",
@@ -134,6 +143,7 @@ VIDEOS_DATA = [
         "src": "https://www.youtube.com/embed/MtTVtaA9W0I"
     }
 ]
+
 F1_SCHEDULE = [
     {
         "title": "Гран-при Сингапура",
@@ -195,8 +205,8 @@ def get_videos():
 
 @app.get("/api/random-car")
 def get_random_car():
-    chassis_list = ["Mercedes W16", "Ferrari SF-25", "McLaren MCL39", "Red Bull RB21"]
-    engine_list = ["Mercedes-AMG V6", "Ferrari V6 Turbo", "Honda RBPT", "Renault E-Tech"]
+    chassis_list = ["Mercedes W17", "Ferrari SF-26", "McLaren MCL40", "Red Bull RB22"]
+    engine_list = ["Mercedes-AMG V6 Turbo", "Ferrari V6 Turbo", "Honda RBPT", "Ford Powertrains"]
     tyres_list = ["Soft (C5 - Красные)", "Medium (C3 - Жёлтые)", "Hard (C1 - Белые)", "Intermediate (Зелёные)"]
     strategy_list = ["Plan A: Undercut", "Plan B: Soft-Medium-Soft", "Hammer Time / Attack", "Box, Box for Fastest Lap"]
 
@@ -205,7 +215,7 @@ def get_random_car():
         "engine": random.choice(engine_list),
         "tyres": random.choice(tyres_list),
         "strategy": random.choice(strategy_list),
-        "score": random.randint(75, 99)
+        "score": random.randint(80, 99)
     }
 
 @app.get("/api/next-race")
@@ -224,13 +234,36 @@ def get_next_race():
 
 @app.get("/api/leaderboard")
 def get_leaderboard():
+    # Строго топ-5
     return sorted(LEADERBOARD, key=lambda x: x["time_ms"])[:5]
 
 @app.post("/api/leaderboard")
 def save_score(score: ScoreRequest):
+    global LEADERBOARD
     LEADERBOARD.append({"player": score.player, "time_ms": score.time_ms})
-    return {"status": "success"}
+    # Сортируем и оставляем ровно топ-5
+    LEADERBOARD = sorted(LEADERBOARD, key=lambda x: x["time_ms"])[:5]
+    return {"status": "success", "leaderboard": LEADERBOARD}
 
-# Мнтирование фронтенда ДОЛЖНО быть строкой НИЖЕ ВСЕХ @app.get роутов
+@app.post("/api/ai-chat")
+def ai_chat(req: ChatRequest):
+    msg = req.message.lower()
+    
+    if "зачем" in msg or "сайт" in msg or "цель" in msg:
+        reply = "Этот сайт — фан-хаб, созданный для любителей Формулы-1 и команды Mercedes. Здесь вы можете следить за расписанием гран-при, изучать историю команды, смотреть эксклюзивные эдиты, собирать конфигурации болидов и соревноваться в мини-играх!"
+    elif "mercedes" in msg or "команд" in msg or "петронас" in msg:
+        reply = "Mercedes-AMG Petronas F1 Team — легендарная заводская команда, удерживающая рекорд по количеству Кубков конструкторов подряд (8 титулов с 2014 по 2021 год) и славящаяся своими 'Серебряными стрелами'."
+    elif "хэмилтон" in msg or "hamilton" in msg:
+        reply = "Льюис Хэмилтон (#44) — семикратный чемпион мира, легенда автоспорта, обладатель рекордов по победам (105) и поулам (104)."
+    elif "рассел" in msg or "russell" in msg:
+        reply = "Джордж Рассел (#63) — британский топ-пилот Mercedes, отличающийся невероятной стабильностью, мастерством в квалификациях и победным темпом."
+    elif "антонелли" in msg or "kimi" in msg or "кими" in msg:
+        reply = "Кими Антонелли (#12) — молодой итальянский суперталант и восходящая звезда команды Mercedes в новом поколении Формулы-1."
+    else:
+        reply = "Я виртуальный ИИ-ассистент этого фан-хаба. Спросите меня о назначении сайта, истории Mercedes F1 или о трех любимых пилотах: Льюисе Хэмилтоне, Джордже Расселе и Кими Антонелли!"
+        
+    return {"reply": reply}
+
+# Монтирование фронтенда в самом конце
 if os.path.exists(FRONTEND_DIR):
     app.mount("/", StaticFiles(directory=FRONTEND_DIR, html=True), name="frontend")

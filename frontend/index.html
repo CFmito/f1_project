@@ -1,265 +1,294 @@
-  <!DOCTYPE html>
-  <html lang="ru">
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MERCEDES & F1 HUB</title>
-    
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            colors: {
-              navyBg: '#0b0f19',
-              navyCard: '#111827',
-              navyBorder: '#1f2937',
-              cyanAccent: '#00d2ff',
-            }
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MERCEDES & F1 HUB</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            navyBg: '#0b0f19',
+            navyCard: '#111827',
+            navyBorder: '#1f2937',
+            cyanAccent: '#00d2ff',
           }
         }
       }
-    </script>
+    }
+  </script>
 
-    <!-- Подключение кастомных стилей из корня frontend -->
-    <link rel="stylesheet" href="/style.css">
-  </head>
-  <body class="bg-navyBg text-slate-100 font-sans min-h-screen flex flex-col justify-between">
+  <!-- Подключение кастомных стилей из корня frontend -->
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body class="bg-navyBg text-slate-100 font-sans min-h-screen flex flex-col justify-between">
 
-    <!-- Шапка / Навигация -->
-    <header class="border-b border-navyBorder bg-navyBg/80 backdrop-blur-md sticky top-0 z-40">
-      <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-        <div class="flex items-center gap-3">
-          <span class="bg-cyanAccent text-navyBg font-black px-2 py-1 rounded text-sm italic">F1</span>
-          <h1 class="text-xl font-black tracking-wider text-white">MERCEDES & F1 HUB</h1>
-        </div>
-        <nav class="hidden md:flex gap-6 text-sm font-semibold text-slate-300">
-          <a href="#media" class="hover:text-cyanAccent transition">Медиа</a>
-          <a href="#history" class="hover:text-cyanAccent transition">История</a>
-          <a href="#drivers" class="hover:text-cyanAccent transition">Пилоты</a>
-          <a href="#randomizer" class="hover:text-cyanAccent transition">Рандомайзер</a>
-          <a href="#games" class="hover:text-cyanAccent transition">Мини-Игры</a>
-        </nav>
+  <!-- Шапка / Навигация -->
+  <header class="border-b border-navyBorder bg-navyBg/80 backdrop-blur-md sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+      <div class="flex items-center gap-3">
+        <span class="bg-cyanAccent text-navyBg font-black px-2 py-1 rounded text-sm italic">F1</span>
+        <h1 class="text-xl font-black tracking-wider text-white">MERCEDES & F1 HUB</h1>
       </div>
-    </header>
-
-    <!-- Основной контент -->
-    <main class="max-w-7xl mx-auto px-6 py-10 w-full flex-grow">
-
-      <!-- 1. Виджет ближайшего Гран-при -->
-      <section class="mb-12 bg-gradient-to-r from-blue-900/40 to-navyCard border border-cyanAccent/30 rounded-2xl p-6 sm:p-8 shadow-2xl relative overflow-hidden">
-        <div class="flex flex-col md:flex-row justify-between items-center gap-6">
-          <div>
-            <span class="text-xs font-bold text-cyanAccent uppercase tracking-widest block mb-1">🏎 БЛИЖАЙШИЙ ЭТАП F1</span>
-            <h2 id="race-title" class="text-2xl sm:text-3xl font-extrabold text-white">Загрузка...</h2>
-            <p id="race-location" class="text-slate-400 text-sm mt-1">📍 ...</p>
-          </div>
-
-          <!-- Обратный отсчет -->
-          <div class="flex gap-3 text-center">
-            <div class="bg-navyBg/80 border border-navyBorder px-3.5 py-2 rounded-xl min-w-[65px]">
-              <span id="timer-days" class="text-2xl font-black text-cyanAccent block">00</span>
-              <span class="text-[10px] text-slate-400 font-semibold uppercase">Дней</span>
-            </div>
-            <div class="bg-navyBg/80 border border-navyBorder px-3.5 py-2 rounded-xl min-w-[65px]">
-              <span id="timer-hours" class="text-2xl font-black text-cyanAccent block">00</span>
-              <span class="text-[10px] text-slate-400 font-semibold uppercase">Часов</span>
-            </div>
-            <div class="bg-navyBg/80 border border-navyBorder px-3.5 py-2 rounded-xl min-w-[65px]">
-              <span id="timer-minutes" class="text-2xl font-black text-cyanAccent block">00</span>
-              <span class="text-[10px] text-slate-400 font-semibold uppercase">Мин</span>
-            </div>
-            <div class="bg-navyBg/80 border border-navyBorder px-3.5 py-2 rounded-xl min-w-[65px]">
-              <span id="timer-seconds" class="text-2xl font-black text-cyanAccent block">00</span>
-              <span class="text-[10px] text-slate-400 font-semibold uppercase">Сек</span>
-            </div>
-          </div>
-        </div>
-      </section>
-  <!-- 2. Секция Медиа и Эдитов -->
-  <section id="media" class="w-full mb-16">
-    <!-- Заголовок во всю ширину -->
-    <h2 class="text-3xl font-extrabold text-white mb-6 border-l-4 border-cyanAccent pl-4 flex items-center gap-2">
-      <span>🎬</span> Медиа и Эдиты
-    </h2>
-
-    <!-- Контейнер на всю ширину -->
-    <div class="w-full mx-auto">
-      <!-- Переключатель категорий (Остались только История и Эдиты) -->
-      <div class="flex gap-2 mb-6 overflow-x-auto pb-2 scrollbar-none">
-        <button onclick="filterVideos('history')" class="video-tab active bg-cyanAccent text-black font-bold px-4 py-2 rounded-xl text-sm transition cursor-pointer">
-          История
-        </button>
-        <button onclick="filterVideos('edits')" class="video-tab bg-navyCard text-slate-300 hover:text-white border border-navyBorder font-semibold px-4 py-2 rounded-xl text-sm transition cursor-pointer">
-          Эдиты
-        </button>
-      </div>
-
-      <!-- Сетка превью видео на всю ширину (адаптивная: 1, 2, 3 или 4 колонки) -->
-      <div id="videos-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        <!-- Карточки рендерятся через JS -->
-      </div>
+      <nav class="hidden md:flex gap-6 text-sm font-semibold text-slate-300">
+        <a href="#media" class="hover:text-cyanAccent transition">Медиа</a>
+        <a href="#history" class="hover:text-cyanAccent transition">История</a>
+        <a href="#drivers" class="hover:text-cyanAccent transition">Пилоты</a>
+        <a href="#randomizer" class="hover:text-cyanAccent transition">Рандомайзер</a>
+        <a href="#games" class="hover:text-cyanAccent transition">Мини-Игры</a>
+      </nav>
     </div>
-  </section>
+  </header>
 
-      <!-- 3. Секция истории команды -->
-      <section id="history" class="history-section w-full mb-16">
-        <h2 class="text-3xl font-extrabold text-white mb-6 border-l-4 border-cyanAccent pl-4">История команды</h2>
-        <div id="history-timeline" class="timeline w-full">
+  <!-- Основной контент -->
+  <main class="max-w-7xl mx-auto px-6 py-10 w-full flex-grow">
+
+    <!-- 1. Виджет ближайшего Гран-при -->
+    <section class="mb-12 bg-gradient-to-r from-blue-900/40 to-navyCard border border-cyanAccent/30 rounded-2xl p-6 sm:p-8 shadow-2xl relative overflow-hidden">
+      <div class="flex flex-col md:flex-row justify-between items-center gap-6">
+        <div>
+          <span class="text-xs font-bold text-cyanAccent uppercase tracking-widest block mb-1">🏎 БЛИЖАЙШИЙ ЭТАП F1</span>
+          <h2 id="race-title" class="text-2xl sm:text-3xl font-extrabold text-white">Загрузка...</h2>
+          <p id="race-location" class="text-slate-400 text-sm mt-1">📍 ...</p>
+        </div>
+
+        <!-- Обратный отсчет -->
+        <div class="flex gap-3 text-center">
+          <div class="bg-navyBg/80 border border-navyBorder px-3.5 py-2 rounded-xl min-w-[65px]">
+            <span id="timer-days" class="text-2xl font-black text-cyanAccent block">00</span>
+            <span class="text-[10px] text-slate-400 font-semibold uppercase">Дней</span>
+          </div>
+          <div class="bg-navyBg/80 border border-navyBorder px-3.5 py-2 rounded-xl min-w-[65px]">
+            <span id="timer-hours" class="text-2xl font-black text-cyanAccent block">00</span>
+            <span class="text-[10px] text-slate-400 font-semibold uppercase">Часов</span>
+          </div>
+          <div class="bg-navyBg/80 border border-navyBorder px-3.5 py-2 rounded-xl min-w-[65px]">
+            <span id="timer-minutes" class="text-2xl font-black text-cyanAccent block">00</span>
+            <span class="text-[10px] text-slate-400 font-semibold uppercase">Мин</span>
+          </div>
+          <div class="bg-navyBg/80 border border-navyBorder px-3.5 py-2 rounded-xl min-w-[65px]">
+            <span id="timer-seconds" class="text-2xl font-black text-cyanAccent block">00</span>
+            <span class="text-[10px] text-slate-400 font-semibold uppercase">Сек</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. Секция Медиа и Эдитов -->
+    <section id="media" class="w-full mb-16">
+      <h2 class="text-3xl font-extrabold text-white mb-6 border-l-4 border-cyanAccent pl-4 flex items-center gap-2">
+        <span>🎬</span> Медиа и Эдиты
+      </h2>
+
+      <div class="w-full mx-auto">
+        <div class="flex gap-2 mb-6 overflow-x-auto pb-2 scrollbar-none">
+          <button onclick="filterVideos('history')" class="video-tab active bg-cyanAccent text-black font-bold px-4 py-2 rounded-xl text-sm transition cursor-pointer">
+            История
+          </button>
+          <button onclick="filterVideos('edits')" class="video-tab bg-navyCard text-slate-300 hover:text-white border border-navyBorder font-semibold px-4 py-2 rounded-xl text-sm transition cursor-pointer">
+            Эдиты
+          </button>
+        </div>
+
+        <div id="videos-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           <!-- Карточки рендерятся через JS -->
         </div>
-      </section>
+      </div>
+    </section>
 
-      <!-- 4. Секция пилотов -->
-      <section id="drivers" class="mb-16">
-        <h2 class="text-3xl font-extrabold text-white mb-8 border-l-4 border-cyanAccent pl-4">Пилоты команды</h2>
-        <div id="drivers-container" class="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <!-- Карточки динамически загружаются из JS -->
-        </div>
-      </section>
+    <!-- 3. Секция истории команды -->
+    <section id="history" class="history-section w-full mb-16">
+      <h2 class="text-3xl font-extrabold text-white mb-6 border-l-4 border-cyanAccent pl-4">История команды</h2>
+      <div id="history-timeline" class="timeline w-full">
+        <!-- Карточки рендерятся через JS -->
+      </div>
+    </section>
 
-      <!-- 5. Секция Рандомайзера болида -->
-      <section id="randomizer" class="mb-16 bg-navyCard border border-navyBorder rounded-2xl p-8 shadow-xl">
-        <div class="max-w-2xl mx-auto text-center">
-          <h2 class="text-3xl font-extrabold text-white mb-2">⚙️ Генератор сетапа болида</h2>
-          <p class="text-slate-400 text-sm mb-6">Сгенерируйте случайную конфигурацию болида F1 и узнайте её потенциал.</p>
-          
-          <button id="randomize-btn" class="bg-cyanAccent text-navyBg font-black px-8 py-3 rounded-xl hover:bg-cyan-400 transition transform active:scale-95 shadow-lg cursor-pointer">
-            🏎️ Собрать болид
-          </button>
+    <!-- 4. Секция пилотов -->
+    <section id="drivers" class="mb-16">
+      <h2 class="text-3xl font-extrabold text-white mb-8 border-l-4 border-cyanAccent pl-4">Пилоты команды</h2>
+      <div id="drivers-container" class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <!-- Карточки динамически загружаются из JS -->
+      </div>
+    </section>
 
-          <div id="car-result" class="hidden mt-8 text-left bg-navyBg/70 border border-navyBorder rounded-xl p-6">
-            <h3 class="text-lg font-bold text-cyanAccent mb-4 border-b border-navyBorder pb-2">Результат сборки:</h3>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
-              <div><span class="text-slate-400">Шасси:</span> <b id="res-chassis" class="text-white"></b></div>
-              <div><span class="text-slate-400">Двигатель:</span> <b id="res-engine" class="text-white"></b></div>
-              <div><span class="text-slate-400">Шины:</span> <b id="res-tyres" class="text-white"></b></div>
-              <div><span class="text-slate-400">Стратегия:</span> <b id="res-strategy" class="text-white"></b></div>
-            </div>
-            <div class="mt-4 pt-3 border-t border-navyBorder flex justify-between items-center">
-              <span class="text-slate-400 text-sm">Итоговый рейтинг болида:</span>
-              <span id="res-score" class="text-2xl font-black text-cyanAccent"></span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- 6. Секция Игр -->
-      <section id="games" class="mb-16">
-        <h2 class="text-3xl font-extrabold text-white mb-8 border-l-4 border-cyanAccent pl-4">Интерактивные Игры</h2>
+    <!-- 5. Секция Рандомайзера болида -->
+    <section id="randomizer" class="mb-16 bg-navyCard border border-navyBorder rounded-2xl p-8 shadow-xl">
+      <div class="max-w-2xl mx-auto text-center">
+        <h2 class="text-3xl font-extrabold text-white mb-2">⚙️ Генератор сетапа болида</h2>
+        <p class="text-slate-400 text-sm mb-6">Сгенерируйте случайную конфигурацию болида F1 и узнайте её потенциал.</p>
         
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
-          
-          <!-- Игра 1: Тест Реакции -->
-          <div class="bg-navyCard border border-navyBorder rounded-2xl p-6 shadow-xl flex flex-col justify-between">
-            <div>
-              <h3 class="text-xl font-extrabold text-white mb-2">🚦 Тест реакции пилота</h3>
-              <p class="text-xs text-slate-400 mb-4">Погасите огни светофора как можно быстрее!</p>
-              
-              <div id="reaction-status" class="text-lg font-bold mb-4 text-amber-400">Нажмите «Старт»</div>
-              
-              <div id="lights-container" class="flex justify-center gap-3 bg-slate-900/80 p-4 rounded-xl mb-4 border border-slate-800 cursor-pointer">
-                <div class="w-8 h-8 rounded-full bg-slate-800 light-circle"></div>
-                <div class="w-8 h-8 rounded-full bg-slate-800 light-circle"></div>
-                <div class="w-8 h-8 rounded-full bg-slate-800 light-circle"></div>
-                <div class="w-8 h-8 rounded-full bg-slate-800 light-circle"></div>
-                <div class="w-8 h-8 rounded-full bg-slate-800 light-circle"></div>
-              </div>
+        <button id="randomize-btn" class="bg-cyanAccent text-navyBg font-black px-8 py-3 rounded-xl hover:bg-cyan-400 transition transform active:scale-95 shadow-lg cursor-pointer">
+          🏎️ Собрать болид
+        </button>
 
-              <button id="start-reaction-btn" class="w-full bg-cyanAccent text-navyBg font-bold py-2.5 rounded-xl hover:bg-cyan-400 transition cursor-pointer">
-                Старт
-              </button>
-            </div>
-
-            <!-- Таблица лидеров -->
-            <div class="mt-6 pt-4 border-t border-navyBorder">
-              <div class="flex justify-between items-center mb-3">
-                <h4 class="text-xs font-bold text-slate-300">🏆 Топ реакция (Leaderboard)</h4>
-                <span class="text-[10px] text-cyanAccent font-normal">Best Drivers</span>
-              </div>
-              <ol id="leaderboard-list" class="space-y-1.5 text-xs text-slate-300">
-                <!-- Загружается из JS -->
-              </ol>
-            </div>
+        <div id="car-result" class="hidden mt-8 text-left bg-navyBg/70 border border-navyBorder rounded-xl p-6">
+          <h3 class="text-lg font-bold text-cyanAccent mb-4 border-b border-navyBorder pb-2">Результат сборки:</h3>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+            <div><span class="text-slate-400">Шасси:</span> <b id="res-chassis" class="text-white"></b></div>
+            <div><span class="text-slate-400">Двигатель:</span> <b id="res-engine" class="text-white"></b></div>
+            <div><span class="text-slate-400">Шины:</span> <b id="res-tyres" class="text-white"></b></div>
+            <div><span class="text-slate-400">Стратегия:</span> <b id="res-strategy" class="text-white"></b></div>
           </div>
+          <div class="mt-4 pt-3 border-t border-navyBorder flex justify-between items-center">
+            <span class="text-slate-400 text-sm">Итоговый рейтинг болида:</span>
+            <span id="res-score" class="text-2xl font-black text-cyanAccent"></span>
+          </div>
+        </div>
+      </div>
+    </section>
 
-          <!-- Игра 2: Мини-гонка Canvas -->
-          <div class="bg-navyCard border border-navyBorder rounded-2xl p-6 shadow-xl flex flex-col items-center">
-            <h3 class="text-xl font-extrabold text-white mb-2 self-start">🏁 Мини-гонка на трассе</h3>
-            <p class="text-xs text-slate-400 mb-4 self-start">Управляйте стрелками ◄ ► (или A/D) и объезжайте соперников.</p>
+    <!-- 6. Секция Игр -->
+    <section id="games" class="mb-16">
+      <h2 class="text-3xl font-extrabold text-white mb-8 border-l-4 border-cyanAccent pl-4">Интерактивные Игры</h2>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+        
+        <!-- Игра 1: Тест Реакции -->
+        <div class="bg-navyCard border border-navyBorder rounded-2xl p-6 shadow-xl flex flex-col justify-between">
+          <div>
+            <h3 class="text-xl font-extrabold text-white mb-2">🚦 Тест реакции пилота</h3>
+            <p class="text-xs text-slate-400 mb-4">Погасите огни светофора как можно быстрее!</p>
             
-            <div class="relative mb-4">
-              <canvas id="raceCanvas" width="270" height="320" class="bg-slate-900 rounded-xl border-2 border-navyBorder shadow-inner"></canvas>
-              <div id="race-score" class="absolute top-2 right-3 text-xs font-mono font-bold text-cyanAccent bg-navyBg/80 px-2 py-1 rounded border border-navyBorder">Счет: 0</div>
+            <div id="reaction-status" class="text-lg font-bold mb-4 text-amber-400">Нажмите «Старт»</div>
+            
+            <div id="lights-container" class="flex justify-center gap-3 bg-slate-900/80 p-4 rounded-xl mb-4 border border-slate-800 cursor-pointer">
+              <div class="w-8 h-8 rounded-full bg-slate-800 light-circle"></div>
+              <div class="w-8 h-8 rounded-full bg-slate-800 light-circle"></div>
+              <div class="w-8 h-8 rounded-full bg-slate-800 light-circle"></div>
+              <div class="w-8 h-8 rounded-full bg-slate-800 light-circle"></div>
+              <div class="w-8 h-8 rounded-full bg-slate-800 light-circle"></div>
             </div>
 
-            <button id="start-race-btn" class="w-full bg-cyanAccent text-navyBg font-bold py-2.5 rounded-xl hover:bg-cyan-400 transition cursor-pointer">
-              Начать гонку
+            <button id="start-reaction-btn" class="w-full bg-cyanAccent text-navyBg font-bold py-2.5 rounded-xl hover:bg-cyan-400 transition cursor-pointer">
+              Старт
             </button>
           </div>
 
-        </div>
-      </section>
-
-    </main>
-
-    <!-- Модальное окно плеера видео -->
-    <div id="video-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
-      <div class="bg-navyCard border border-navyBorder rounded-2xl w-full max-w-3xl overflow-hidden shadow-2xl relative">
-        
-        <button id="close-video-modal" class="absolute top-3 right-3 z-10 bg-black/60 text-white hover:text-cyanAccent w-9 h-9 rounded-full flex items-center justify-center text-xl transition cursor-pointer">
-          ✕
-        </button>
-
-        <div id="video-player-container" class="w-full aspect-video bg-black flex items-center justify-center">
-          <!-- iframe или video вставляется через JS -->
-        </div>
-
-        <div class="p-4 bg-navyCard">
-          <h3 id="modal-video-title" class="text-white font-bold text-lg mb-1"></h3>
-          <p id="modal-video-desc" class="text-slate-400 text-sm"></p>
-        </div>
-
-      </div>
-    </div>
-
-    <!-- Модальное окно пилота -->
-    <div id="driver-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-      <div class="bg-navyCard border border-navyBorder rounded-2xl max-w-2xl w-full overflow-hidden shadow-2xl relative animate-fadeIn">
-        
-        <button id="close-modal-btn" class="absolute top-3 right-3 z-10 bg-navyBg/80 hover:bg-slate-700 text-slate-300 hover:text-cyanAccent w-9 h-9 rounded-full flex items-center justify-center border border-navyBorder text-lg font-bold transition cursor-pointer">
-          ✕
-        </button>
-
-        <div class="flex flex-col md:flex-row">
-          <img id="modal-img" src="" alt="" class="w-full md:w-1/2 h-72 md:h-auto object-cover">
-          
-          <div class="p-6 md:w-1/2 flex flex-col justify-between relative pr-12">
-            <div>
-              <div class="flex justify-between items-center mb-1">
-                <h3 id="modal-name" class="text-2xl font-extrabold text-white"></h3>
-                <span id="modal-number" class="text-3xl font-black text-cyanAccent italic ml-2"></span>
-              </div>
-              <p id="modal-team" class="text-xs text-blue-400 font-semibold uppercase tracking-wider mb-4"></p>
-              <p id="modal-bio" class="text-slate-300 text-sm leading-relaxed mb-6"></p>
+          <!-- Таблица лидеров -->
+          <div class="mt-6 pt-4 border-t border-navyBorder">
+            <div class="flex justify-between items-center mb-3">
+              <h4 class="text-xs font-bold text-slate-300">🏆 Топ реакция (Leaderboard)</h4>
+              <span class="text-[10px] text-cyanAccent font-normal">Best Top-5</span>
             </div>
-
-            <div class="flex justify-between text-sm text-slate-200 pt-4 border-t border-navyBorder bg-navyBg/50 p-3 rounded-lg">
-              <span>🏆 Подиумы: <b id="modal-podiums" class="text-cyanAccent"></b></span>
-              <span>👑 Титулы: <b id="modal-titles" class="text-cyanAccent"></b></span>
-            </div>
+            <ol id="leaderboard-list" class="space-y-1.5 text-xs text-slate-300">
+              <!-- Загружается из JS -->
+            </ol>
           </div>
         </div>
+
+        <!-- Игра 2: Мини-гонка Canvas -->
+        <div class="bg-navyCard border border-navyBorder rounded-2xl p-6 shadow-xl flex flex-col items-center">
+          <h3 class="text-xl font-extrabold text-white mb-2 self-start">🏁 Мини-гонка на трассе</h3>
+          <p class="text-xs text-slate-400 mb-4 self-start">Управляйте стрелками ◄ ► (или A/D) и объезжайте соперников.</p>
+          
+          <div class="relative mb-4">
+            <canvas id="raceCanvas" width="270" height="320" class="bg-slate-900 rounded-xl border-2 border-navyBorder shadow-inner"></canvas>
+            <div id="race-score" class="absolute top-2 right-3 text-xs font-mono font-bold text-cyanAccent bg-navyBg/80 px-2 py-1 rounded border border-navyBorder">Счет: 0</div>
+          </div>
+
+          <button id="start-race-btn" class="w-full bg-cyanAccent text-navyBg font-bold py-2.5 rounded-xl hover:bg-cyan-400 transition cursor-pointer">
+            Начать гонку
+          </button>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Модальное окно плеера видео -->
+  <div id="video-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-navyCard border border-navyBorder rounded-2xl w-full max-w-3xl overflow-hidden shadow-2xl relative">
+      <button id="close-video-modal" class="absolute top-3 right-3 z-10 bg-black/60 text-white hover:text-cyanAccent w-9 h-9 rounded-full flex items-center justify-center text-xl transition cursor-pointer">
+        ✕
+      </button>
+      <div id="video-player-container" class="w-full aspect-video bg-black flex items-center justify-center"></div>
+      <div class="p-4 bg-navyCard">
+        <h3 id="modal-video-title" class="text-white font-bold text-lg mb-1"></h3>
+        <p id="modal-video-desc" class="text-slate-400 text-sm"></p>
       </div>
     </div>
+  </div>
 
-    <!-- Футер -->
-    <footer class="border-t border-navyBorder bg-navyBg py-6 text-center text-xs text-slate-500">
-      <p>© 2026 Mercedes & F1 Fan Hub. Разработано для демонстрационного проекта.</p>
-    </footer>
+ <!-- Модальное окно пилота -->
+ <div id="driver-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+  <div class="bg-navyCard border border-navyBorder rounded-2xl max-w-2xl w-full overflow-hidden shadow-2xl relative animate-fadeIn">
+    
+    <!-- Кнопка закрытия с повышенным z-index -->
+    <button id="close-modal-btn" class="absolute top-3 right-3 z-30 bg-navyBg/80 hover:bg-slate-700 text-slate-300 hover:text-cyanAccent w-9 h-9 rounded-full flex items-center justify-center border border-navyBorder text-lg font-bold transition cursor-pointer shadow-lg">
+      ✕
+    </button>
 
-    <!-- Подключение JS и CSS скриптов -->
-    <script src="app.js?v=4"></script>
-  </body>
-  </html>
+    <div class="flex flex-col md:flex-row">
+      <img id="modal-img" src="" alt="" class="w-full md:w-1/2 h-72 md:h-auto object-cover">
+      
+      <!-- Добавлен pr-12, чтобы текст и номер не залетали под кнопку закрытия -->
+      <div class="p-6 md:w-1/2 flex flex-col justify-between relative pr-12 pt-10 md:pt-6">
+        <div>
+          <div class="flex justify-between items-center mb-1">
+            <h3 id="modal-name" class="text-2xl font-extrabold text-white"></h3>
+            <span id="modal-number" class="text-3xl font-black text-cyanAccent italic ml-2"></span>
+          </div>
+          <p id="modal-team" class="text-xs text-blue-400 font-semibold uppercase tracking-wider mb-4"></p>
+          <p id="modal-bio" class="text-slate-300 text-sm leading-relaxed mb-6"></p>
+        </div>
+
+        <!-- Сетка статистики -->
+        <div class="grid grid-cols-2 gap-2 text-xs sm:text-sm text-slate-200 pt-4 border-t border-navyBorder bg-navyBg/50 p-3 rounded-lg">
+          <span>🏆 Подиумы: <b id="modal-podiums" class="text-cyanAccent"></b></span>
+          <span>👑 Титулы: <b id="modal-titles" class="text-cyanAccent"></b></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <!-- Модальное окно сохранения результата мини-игр -->
+  <div id="score-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-navyCard border border-navyBorder rounded-2xl w-full max-w-md p-6 shadow-2xl relative">
+      <h3 class="text-xl font-extrabold text-white mb-2">🏆 Новый результат!</h3>
+      <p id="modal-score-text" class="text-slate-400 text-sm mb-4">Ваш результат: 0</p>
+      <input type="text" id="player-name-input" placeholder="Введите ваше имя" class="w-full bg-navyBg border border-navyBorder rounded-xl px-4 py-2.5 text-white mb-4 focus:border-cyanAccent outline-none">
+      <div class="flex gap-3">
+        <button id="save-score-btn" class="flex-1 bg-cyanAccent text-navyBg font-bold py-2.5 rounded-xl hover:bg-cyan-400 transition cursor-pointer">Сохранить</button>
+        <button id="cancel-score-btn" class="bg-slate-800 text-slate-300 px-4 py-2.5 rounded-xl hover:bg-slate-700 transition cursor-pointer">Отмена</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Плавающий ИИ-чат с ботом -->
+  <div class="fixed bottom-6 right-6 z-40">
+    <div id="chat-window" class="hidden w-80 sm:w-96 bg-navyCard border border-navyBorder rounded-2xl shadow-2xl overflow-hidden flex flex-col mb-4">
+      <div class="bg-slate-900 px-4 py-3 border-b border-navyBorder flex justify-between items-center">
+        <span class="font-bold text-sm text-cyanAccent">🤖 AI-ассистент Mercedes F1</span>
+        <button id="close-chat" class="text-slate-400 hover:text-white cursor-pointer">✕</button>
+      </div>
+      <div id="chat-messages" class="p-4 h-72 overflow-y-auto space-y-3 text-xs flex flex-col">
+        <div class="bg-navyBg p-2.5 rounded-xl text-slate-300 self-start max-w-[85%] border border-navyBorder">
+          Привет! Задайте мне вопрос о сайте, команде Mercedes F1 или наших пилотах.
+        </div>
+      </div>
+      <div class="p-3 border-t border-navyBorder flex gap-2 bg-navyBg">
+        <input type="text" id="chat-input" placeholder="Введите вопрос..." class="flex-1 bg-navyCard border border-navyBorder rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-cyanAccent">
+        <button id="send-chat" class="bg-cyanAccent text-navyBg font-bold px-3 py-2 rounded-xl text-xs hover:bg-cyan-400 cursor-pointer">➤</button>
+      </div>
+    </div>
+    <button id="toggle-chat" class="bg-cyanAccent text-navyBg w-14 h-14 rounded-full shadow-2xl flex items-center justify-center font-bold text-2xl hover:scale-110 transition cursor-pointer ml-auto">
+      💬
+    </button>
+  </div>
+
+  <!-- Футер -->
+  <footer class="border-t border-navyBorder bg-navyBg py-6 text-center text-xs text-slate-500">
+    <p>© 2026 Mercedes & F1 Fan Hub. Разработано для демонстрационного проекта.</p>
+  </footer>
+
+  <!-- Подключение JS скрипта с контролем кэша -->
+  <script src="app.js?v=5"></script>
+</body>
+</html>
